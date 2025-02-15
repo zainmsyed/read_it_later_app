@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, ilike, and, or, inArray } from "drizzle-orm";
+import { eq, ilike, and, or, arrayContains, SQL } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -65,7 +65,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createArticle(insertArticle: InsertArticle): Promise<Article> {
-    const [article] = await db.insert(articles).values(insertArticle).returning();
+    const [article] = await db.insert(articles).values({
+      ...insertArticle,
+      created: new Date(),
+    }).returning();
     return article;
   }
 
@@ -116,7 +119,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
-    let conditions = [eq(articles.userId, userId)];
+    const conditions: SQL[] = [eq(articles.userId, userId)];
 
     if (query) {
       conditions.push(
@@ -129,7 +132,8 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (tags && tags.length > 0) {
-      conditions.push(inArray(articles.tags, tags));
+      // Use arrayContains for PostgreSQL array column
+      conditions.push(arrayContains(articles.tags, tags));
     }
 
     return db

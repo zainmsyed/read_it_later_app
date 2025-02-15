@@ -12,7 +12,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
-import { SearchIcon, Tag, Clock, Archive } from "lucide-react";
+import { SearchIcon, Tag } from "lucide-react";
 
 export function SearchCommandPalette({
   open,
@@ -44,7 +44,11 @@ export function SearchCommandPalette({
   });
 
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange}>
+    <CommandDialog 
+      open={open} 
+      onOpenChange={onOpenChange}
+      aria-label="Search articles"
+    >
       <Command className="rounded-lg border shadow-md">
         <CommandInput
           placeholder="Search articles..."
@@ -52,7 +56,7 @@ export function SearchCommandPalette({
           onValueChange={setSearch}
         />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>No articles found.</CommandEmpty>
           {articles.length > 0 && (
             <CommandGroup heading="Articles">
               {articles.map((article) => (

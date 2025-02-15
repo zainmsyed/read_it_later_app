@@ -28,9 +28,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    const article = await storage.getArticle(Number(req.params.id));
-    if (!article || article.userId !== req.user.id) return res.sendStatus(404);
-    res.json(article);
+
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
+
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
+      res.json(article);
+    } catch (error) {
+      console.error("Error fetching article:", error);
+      res.status(500).json({ message: "Failed to fetch article" });
+    }
   });
 
   app.post("/api/articles", async (req, res) => {
@@ -81,33 +94,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
-    const article = await storage.getArticle(Number(req.params.id));
-    if (!article || article.userId !== req.user.id) return res.sendStatus(404);
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
 
-    const updated = await storage.updateArticle(article.id, req.body);
-    res.json(updated);
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
+
+      const updated = await storage.updateArticle(article.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating article:", error);
+      res.status(500).json({ message: "Failed to update article" });
+    }
   });
 
   app.delete("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
-    const article = await storage.getArticle(Number(req.params.id));
-    if (!article || article.userId !== req.user.id) return res.sendStatus(404);
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
 
-    await storage.deleteArticle(article.id);
-    res.sendStatus(204);
-  });
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
 
-  app.get("/api/preferences", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    const prefs = await storage.getPreferences(req.user.id);
-    res.json(prefs);
-  });
-
-  app.patch("/api/preferences", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    const updated = await storage.updatePreferences(req.user.id, req.body);
-    res.json(updated);
+      await storage.deleteArticle(article.id);
+      res.sendStatus(204);
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      res.status(500).json({ message: "Failed to delete article" });
+    }
   });
 
   app.get("/api/articles/search", async (req, res) => {
@@ -122,6 +147,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching articles:", error);
       res.status(500).json({ message: "Failed to search articles" });
+    }
+  });
+
+  app.get("/api/preferences", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const prefs = await storage.getPreferences(req.user.id);
+    res.json(prefs);
+  });
+
+  app.patch("/api/preferences", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    try {
+      const updated = await storage.updatePreferences(req.user.id, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      res.status(500).json({ message: "Failed to update preferences" });
     }
   });
 
