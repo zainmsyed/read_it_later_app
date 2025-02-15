@@ -4,6 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, ArrowLeft, Archive, Tag, X, Check } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -105,8 +106,32 @@ export default function ReadPage() {
           Back
         </Button>
         <div className="flex-1 flex items-center gap-4 mx-4">
-          {isEditingTags ? (
-            <div className="flex items-center gap-2 flex-1">
+          <div className="flex flex-wrap gap-2">
+            {article.tags?.map((tag) => (
+              <Badge key={tag} variant="secondary">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={startEditing}
+          >
+            <Tag className="h-4 w-4 mr-2" />
+            Edit Tags
+          </Button>
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => archiveMutation.mutate()}>
+          <Archive className="h-4 w-4 mr-2" />
+          Archive
+        </Button>
+      </header>
+
+      <Dialog open={isEditingTags} onOpenChange={(open) => !open && cancelEditing()}>
+        <DialogContent className="sm:max-w-[425px] gap-6">
+          <div className="space-y-4">
+            <div className="flex gap-2">
               <Input
                 value={currentTag}
                 onChange={(e) => setCurrentTag(e.target.value)}
@@ -126,15 +151,44 @@ export default function ReadPage() {
               >
                 <Tag className="h-4 w-4" />
               </Button>
-              <Button
-                size="sm"
-                variant="default"
-                onClick={confirmTagChanges}
-                disabled={updateTagsMutation.isPending}
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
+            </div>
+
+            {pendingTags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {pendingTags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="gap-1">
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="ml-1 hover:text-destructive"
+                      disabled={updateTagsMutation.isPending}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {unusedTags.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Existing tags:</p>
+                <div className="flex flex-wrap gap-2">
+                  {unusedTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-muted"
+                      onClick={() => addExistingTag(tag)}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2">
               <Button
                 size="sm"
                 variant="ghost"
@@ -142,73 +196,32 @@ export default function ReadPage() {
               >
                 Cancel
               </Button>
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-wrap gap-2">
-                {article.tags?.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
               <Button
                 size="sm"
-                variant="ghost"
-                onClick={startEditing}
+                variant="default"
+                onClick={confirmTagChanges}
+                disabled={updateTagsMutation.isPending}
               >
-                <Tag className="h-4 w-4 mr-2" />
-                Edit Tags
+                {updateTagsMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
               </Button>
-            </>
-          )}
-        </div>
-        <Button variant="ghost" size="sm" onClick={() => archiveMutation.mutate()}>
-          <Archive className="h-4 w-4 mr-2" />
-          Archive
-        </Button>
-      </header>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
-          {isEditingTags && (
-            <div className="space-y-4 mb-8 not-prose">
-              {pendingTags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {pendingTags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="gap-1">
-                      {tag}
-                      <button
-                        onClick={() => removeTag(tag)}
-                        className="ml-1 hover:text-destructive"
-                        disabled={updateTagsMutation.isPending}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
-              {unusedTags.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Existing tags:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {unusedTags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-muted"
-                        onClick={() => addExistingTag(tag)}
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
           <div dangerouslySetInnerHTML={{ __html: article.content }} />
         </article>
       </main>
