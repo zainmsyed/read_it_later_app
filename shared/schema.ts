@@ -32,7 +32,18 @@ export const preferences = pgTable("preferences", {
 });
 
 export const insertUserSchema = createInsertSchema(users);
-export const insertArticleSchema = createInsertSchema(articles).omit({ id: true, created: true });
+export const insertArticleSchema = createInsertSchema(articles)
+  .omit({ id: true, created: true })
+  .extend({
+    url: z.string().url("Please enter a valid URL"),
+    title: z.string().optional(), // Make title optional since we'll get it from the URL
+    content: z.string().optional(), // Make content optional since we'll get it from the URL
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional().default([]),
+    notes: z.string().optional(),
+    archived: z.boolean().optional().default(false),
+    logseqSyncStatus: z.string().optional().default("not_synced"),
+  });
 export const insertPreferencesSchema = createInsertSchema(preferences).omit({ id: true });
 
 export type User = typeof users.$inferSelect;

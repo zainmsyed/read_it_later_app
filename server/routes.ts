@@ -24,45 +24,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/articles", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    
-    const parsed = insertArticleSchema.safeParse({ ...req.body, userId: req.user.id });
-    if (!parsed.success) return res.status(400).json(parsed.error);
 
-    // Fetch and parse article content
-    const response = await fetch(req.body.url);
-    const html = await response.text();
-    const doc = new JSDOM(html);
-    const reader = new Readability(doc.window.document);
-    const article = reader.parse();
+    try {
+      // First validate the URL
+      const parsed = insertArticleSchema.safeParse({ 
+        url: req.body.url,
+        userId: req.user.id 
+      });
+      if (!parsed.success) {
+        return res.status(400).json(parsed.error);
+      }
 
-    if (!article) return res.status(400).send("Could not parse article");
+      // Fetch and parse article content
+      const response = await fetch(req.body.url);
+      if (!response.ok) {
+        return res.status(400).json({ message: "Failed to fetch article" });
+      }
 
-    const saved = await storage.createArticle({
-      ...parsed.data,
-      title: article.title || parsed.data.title,
-      content: article.content,
-      description: article.excerpt || "",
-    });
+      const html = await response.text();
+      const doc = new JSDOM(html, { url: req.body.url });
+      const reader = new Readability(doc.window.document);
+      const article = reader.parse();
 
-    res.status(201).json(saved);
+      if (!article) {
+        return res.status(400).json({ message: "Could not parse article content" });
+      }
+
+      // Create the article with parsed content
+      const saved = await storage.createArticle({
+        userId: req.user.id,
+        url: req.body.url,
+        title: article.title,
+        content: article.content,
+        description: article.excerpt || "",
+      });
+
+      res.status(201).json(saved);
+    } catch (error) {
+      console.error("Error creating article:", error);
+      res.status(500).json({ message: "Failed to create article" });
+    }
   });
 
   app.patch("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    
+
     const article = await storage.getArticle(Number(req.params.id));
     if (!article || article.userId !== req.user.id) return res.sendStatus(404);
-    
+
     const updated = await storage.updateArticle(article.id, req.body);
     res.json(updated);
   });
 
   app.delete("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
-    
+
     const article = await storage.getArticle(Number(req.params.id));
     if (!article || article.userId !== req.user.id) return res.sendStatus(404);
-    
+
     await storage.deleteArticle(article.id);
     res.sendStatus(204);
   });
