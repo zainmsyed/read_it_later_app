@@ -11,10 +11,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { useForm } from "react-hook-form";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react"; // Add this import
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false); // Add state for dialog
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -35,6 +37,7 @@ export default function HomePage() {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
       toast({ title: "Article saved successfully" });
       form.reset();
+      setDialogOpen(false); // Close dialog on success
     },
     onError: (error: Error) => {
       toast({
@@ -63,7 +66,7 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-2">
-          <Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
@@ -133,7 +136,7 @@ export default function HomePage() {
       <div className="flex-1 p-8">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl font-semibold mb-6">Reading List</h2>
-          
+
           <div className="space-y-4">
             {articles?.map((article) => (
               <Link key={article.id} href={`/read/${article.id}`}>
