@@ -49,19 +49,32 @@ export function SearchCommandPalette({
       setSelectedTags((prev) =>
         prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
       );
-    } else if (value.startsWith("article:")) {
+      return;
+    }
+
+    if (value.startsWith("article:")) {
       const id = value.replace("article:", "");
       setLocation(`/read/${id}`);
-      onOpenChange(false);
+      handleClose();
     }
-  }, [setLocation, onOpenChange]);
+  }, [setLocation]);
+
+  const handleClose = React.useCallback(() => {
+    setSearch("");
+    setSelectedTags([]);
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  // Reset state when dialog closes
+  React.useEffect(() => {
+    if (!open) {
+      setSearch("");
+      setSelectedTags([]);
+    }
+  }, [open]);
 
   return (
-    <CommandDialog 
-      open={open} 
-      onOpenChange={onOpenChange}
-      aria-label="Search articles"
-    >
+    <CommandDialog open={open} onOpenChange={handleClose}>
       <Command className="rounded-lg border shadow-md">
         <CommandInput
           placeholder="Search articles..."
@@ -77,6 +90,7 @@ export function SearchCommandPalette({
                   key={article.id}
                   value={`article:${article.id}`}
                   onSelect={handleSelect}
+                  className="cursor-pointer"
                 >
                   <SearchIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -102,6 +116,7 @@ export function SearchCommandPalette({
                   key={tag}
                   value={`tag:${tag}`}
                   onSelect={handleSelect}
+                  className="cursor-pointer"
                 >
                   <Tag className="mr-2 h-4 w-4" />
                   <span>{tag}</span>
