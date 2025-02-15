@@ -26,10 +26,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) return res.sendStatus(401);
 
     try {
-      // First validate the URL
+      // First validate the URL and tags
       const parsed = insertArticleSchema.safeParse({ 
         url: req.body.url,
-        userId: req.user.id 
+        userId: req.user.id,
+        tags: req.body.tags || [] 
       });
       if (!parsed.success) {
         return res.status(400).json(parsed.error);
@@ -50,13 +51,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Could not parse article content" });
       }
 
-      // Create the article with parsed content
+      // Create the article with parsed content and tags
       const saved = await storage.createArticle({
         userId: req.user.id,
         url: req.body.url,
         title: article.title,
         content: article.content,
         description: article.excerpt || "",
+        tags: req.body.tags || [],
+        archived: false,
+        logseqSyncStatus: "not_synced"
       });
 
       res.status(201).json(saved);

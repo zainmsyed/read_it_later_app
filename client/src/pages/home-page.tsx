@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -13,11 +13,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentTag, setCurrentTag] = useState("");
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -26,20 +28,33 @@ export default function HomePage() {
   const form = useForm({
     defaultValues: {
       url: "",
+      tags: [] as string[],
     },
-    resolver: zodResolver(insertArticleSchema.pick({ url: true }).extend({
-      url: insertArticleSchema.shape.url
-    }))
+    resolver: zodResolver(insertArticleSchema.pick({ url: true, tags: true }))
   });
 
+  const addTag = () => {
+    if (!currentTag.trim()) return;
+    const currentTags = form.getValues("tags");
+    if (!currentTags.includes(currentTag.trim())) {
+      form.setValue("tags", [...currentTags, currentTag.trim()]);
+    }
+    setCurrentTag("");
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    const currentTags = form.getValues("tags");
+    form.setValue("tags", currentTags.filter(tag => tag !== tagToRemove));
+  };
+
   const addArticleMutation = useMutation({
-    mutationFn: async (url: string) => {
-      const res = await apiRequest("POST", "/api/articles", { url });
-      const data = await res.json();
+    mutationFn: async (data: { url: string; tags: string[] }) => {
+      const res = await apiRequest("POST", "/api/articles", data);
+      const responseData = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Failed to save article");
+        throw new Error(responseData.message || "Failed to save article");
       }
-      return data;
+      return responseData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
@@ -85,7 +100,7 @@ export default function HomePage() {
                 <DialogTitle>Add New Article</DialogTitle>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data.url))} className="space-y-4">
+                <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
                   <FormField
                     control={form.control}
                     name="url"
@@ -99,6 +114,59 @@ export default function HomePage() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Tags</FormLabel>
+                        <FormControl>
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input
+                                value={currentTag}
+                                onChange={(e) => setCurrentTag(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    addTag();
+                                  }
+                                }}
+                                placeholder="Add tags..."
+                                disabled={addArticleMutation.isPending}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addTag}
+                                disabled={addArticleMutation.isPending}
+                              >
+                                <Tag className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {form.watch("tags").map((tag) => (
+                                <Badge key={tag} variant="secondary" className="gap-1">
+                                  {tag}
+                                  <button
+                                    type="button"
+                                    onClick={() => removeTag(tag)}
+                                    className="ml-1 hover:text-destructive"
+                                    disabled={addArticleMutation.isPending}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
                   <Button 
                     type="submit" 
                     className="w-full" 
@@ -171,9 +239,18 @@ export default function HomePage() {
                     <CardContent className="p-6">
                       <CardTitle className="mb-2">{article.title}</CardTitle>
                       {article.description && (
-                        <p className="text-muted-foreground text-sm line-clamp-2">
+                        <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
                           {article.description}
                         </p>
+                      )}
+                      {article.tags && article.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {article.tags.map((tag) => (
+                            <Badge key={tag} variant="secondary">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       )}
                     </CardContent>
                   </Card>
