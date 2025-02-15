@@ -1,116 +1,118 @@
 import { users, articles, preferences, type User, type InsertUser, type Article, type InsertArticle, type Preferences, type InsertPreferences } from "@shared/schema";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import connectPg from "connect-pg-simple";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresStore = connectPg(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   getArticles(userId: number): Promise<Article[]>;
   getArticle(id: number): Promise<Article | undefined>;
   createArticle(article: InsertArticle): Promise<Article>;
   updateArticle(id: number, article: Partial<Article>): Promise<Article>;
   deleteArticle(id: number): Promise<void>;
-  
+
   getPreferences(userId: number): Promise<Preferences>;
   updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences>;
-  
-  sessionStore: session.SessionStore;
+
+  sessionStore: session.Store;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private articles: Map<number, Article>;
-  private preferences: Map<number, Preferences>;
-  private currentId: number;
-  sessionStore: session.SessionStore;
+export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.articles = new Map();
-    this.preferences = new Map();
-    this.currentId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL must be set");
+    }
+
+    this.sessionStore = new PostgresStore({
+      conObject: {
+        connectionString: process.env.DATABASE_URL,
+      },
+      createTableIfMissing: true,
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentId++;
-    const user = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async getArticles(userId: number): Promise<Article[]> {
-    return Array.from(this.articles.values()).filter(
-      (article) => article.userId === userId,
-    );
+    return db.select().from(articles).where(eq(articles.userId, userId));
   }
 
   async getArticle(id: number): Promise<Article | undefined> {
-    return this.articles.get(id);
+    const [article] = await db.select().from(articles).where(eq(articles.id, id));
+    return article;
   }
 
   async createArticle(insertArticle: InsertArticle): Promise<Article> {
-    const id = this.currentId++;
-    const article = {
-      ...insertArticle,
-      id,
-      created: new Date(),
-    };
-    this.articles.set(id, article);
+    const [article] = await db.insert(articles).values(insertArticle).returning();
     return article;
   }
 
   async updateArticle(id: number, article: Partial<Article>): Promise<Article> {
-    const existing = await this.getArticle(id);
-    if (!existing) throw new Error("Article not found");
-    
-    const updated = { ...existing, ...article };
-    this.articles.set(id, updated);
+    const [updated] = await db
+      .update(articles)
+      .set(article)
+      .where(eq(articles.id, id))
+      .returning();
+    if (!updated) throw new Error("Article not found");
     return updated;
   }
 
   async deleteArticle(id: number): Promise<void> {
-    this.articles.delete(id);
+    await db.delete(articles).where(eq(articles.id, id));
   }
 
   async getPreferences(userId: number): Promise<Preferences> {
-    const prefs = this.preferences.get(userId);
-    if (prefs) return prefs;
+    let [prefs] = await db
+      .select()
+      .from(preferences)
+      .where(eq(preferences.userId, userId));
 
-    const defaultPrefs: Preferences = {
-      id: this.currentId++,
-      userId,
-      fontSize: "medium",
-      lineHeight: "normal",
-      margins: "normal",
-      theme: "light",
-    };
-    this.preferences.set(userId, defaultPrefs);
-    return defaultPrefs;
+    if (!prefs) {
+      [prefs] = await db
+        .insert(preferences)
+        .values({
+          userId,
+          fontSize: "medium",
+          lineHeight: "normal",
+          margins: "normal",
+          theme: "light",
+        })
+        .returning();
+    }
+
+    return prefs;
   }
 
   async updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences> {
-    const existing = await this.getPreferences(userId);
-    const updated = { ...existing, ...prefs };
-    this.preferences.set(userId, updated);
+    const [updated] = await db
+      .update(preferences)
+      .set(prefs)
+      .where(eq(preferences.userId, userId))
+      .returning();
+    if (!updated) throw new Error("Preferences not found");
     return updated;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
