@@ -175,7 +175,7 @@ export default function HomePage() {
                                 ))}
                               </div>
                             )}
-                            {existingTags.length > 0 && !form.watch("tags").length && (
+                            {existingTags.length > 0 && (
                               <div className="space-y-2">
                                 <p className="text-sm text-muted-foreground">Existing tags:</p>
                                 <div className="flex flex-wrap gap-2">
