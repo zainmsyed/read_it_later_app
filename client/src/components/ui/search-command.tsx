@@ -30,7 +30,7 @@ export function SearchCommandPalette({
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append("q", search);
-      if (selectedTags.length) params.append("tags", selectedTags.join(","));
+      if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
       const response = await fetch(`/api/articles/search?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to search articles");
       return response.json();

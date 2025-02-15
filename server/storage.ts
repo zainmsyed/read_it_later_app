@@ -121,12 +121,12 @@ export class DatabaseStorage implements IStorage {
   async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
     const conditions: SQL[] = [eq(articles.userId, userId)];
 
-    if (query) {
+    if (query?.trim()) {
       conditions.push(
         or(
-          ilike(articles.title, `%${query}%`),
-          ilike(articles.content, `%${query}%`),
-          ilike(articles.description, `%${query}%`)
+          ilike(articles.title, `%${query.trim()}%`),
+          ilike(articles.content, `%${query.trim()}%`),
+          ilike(articles.description, `%${query.trim()}%`)
         )
       );
     }
