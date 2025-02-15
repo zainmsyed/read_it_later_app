@@ -26,6 +26,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(Array.from(tags).sort());
   });
 
+  // Search endpoint needs to be before the :id route to avoid being caught by it
+  app.get("/api/articles/search", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const query = req.query.q as string;
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : undefined;
+
+    try {
+      const results = await storage.searchArticles(req.user.id, query, tags);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching articles:", error);
+      res.status(500).json({ message: "Failed to search articles" });
+    }
+  });
+
   app.get("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
@@ -135,20 +151,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/articles/search", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-
-    const query = req.query.q as string;
-    const tags = req.query.tags ? (req.query.tags as string).split(",") : undefined;
-
-    try {
-      const results = await storage.searchArticles(req.user.id, query, tags);
-      res.json(results);
-    } catch (error) {
-      console.error("Error searching articles:", error);
-      res.status(500).json({ message: "Failed to search articles" });
-    }
-  });
 
   app.get("/api/preferences", async (req, res) => {
     if (!req.user) return res.sendStatus(401);

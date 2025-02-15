@@ -35,13 +35,26 @@ export function SearchCommandPalette({
       if (!response.ok) throw new Error("Failed to search articles");
       return response.json();
     },
-    enabled: open,
+    enabled: open && (search.length > 0 || selectedTags.length > 0),
   });
 
   const { data: allTags = [] } = useQuery<string[]>({
     queryKey: ["/api/articles/tags"],
     enabled: open,
   });
+
+  const handleSelect = React.useCallback((value: string) => {
+    if (value.startsWith("tag:")) {
+      const tag = value.replace("tag:", "");
+      setSelectedTags((prev) =>
+        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      );
+    } else if (value.startsWith("article:")) {
+      const id = value.replace("article:", "");
+      setLocation(`/read/${id}`);
+      onOpenChange(false);
+    }
+  }, [setLocation, onOpenChange]);
 
   return (
     <CommandDialog 
@@ -62,10 +75,8 @@ export function SearchCommandPalette({
               {articles.map((article) => (
                 <CommandItem
                   key={article.id}
-                  onSelect={() => {
-                    setLocation(`/read/${article.id}`);
-                    onOpenChange(false);
-                  }}
+                  value={`article:${article.id}`}
+                  onSelect={handleSelect}
                 >
                   <SearchIcon className="mr-2 h-4 w-4" />
                   <div className="flex flex-col">
@@ -89,13 +100,8 @@ export function SearchCommandPalette({
               {allTags.map((tag) => (
                 <CommandItem
                   key={tag}
-                  onSelect={() => {
-                    setSelectedTags((prev) =>
-                      prev.includes(tag)
-                        ? prev.filter((t) => t !== tag)
-                        : [...prev, tag]
-                    );
-                  }}
+                  value={`tag:${tag}`}
+                  onSelect={handleSelect}
                 >
                   <Tag className="mr-2 h-4 w-4" />
                   <span>{tag}</span>
