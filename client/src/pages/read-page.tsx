@@ -3,7 +3,7 @@ import { Article } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ArrowLeft, Archive, Tag, X } from "lucide-react";
+import { Loader2, ArrowLeft, Archive, Tag, X, Check } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -15,6 +15,7 @@ export default function ReadPage() {
   const { toast } = useToast();
   const [currentTag, setCurrentTag] = useState("");
   const [isEditingTags, setIsEditingTags] = useState(false);
+  const [pendingTags, setPendingTags] = useState<string[]>([]);
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
@@ -33,6 +34,7 @@ export default function ReadPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
       toast({ title: "Tags updated" });
       setIsEditingTags(false);
+      setPendingTags([]);
     },
   });
 
@@ -47,29 +49,38 @@ export default function ReadPage() {
     },
   });
 
+  // Initialize pending tags when entering edit mode
+  const startEditing = () => {
+    setPendingTags(article?.tags || []);
+    setIsEditingTags(true);
+  };
+
   const addTag = () => {
-    if (!currentTag.trim() || !article) return;
-    const newTags = [...(article.tags || [])];
-    if (!newTags.includes(currentTag.trim())) {
-      newTags.push(currentTag.trim());
-      updateTagsMutation.mutate(newTags);
+    if (!currentTag.trim()) return;
+    if (!pendingTags.includes(currentTag.trim())) {
+      setPendingTags([...pendingTags, currentTag.trim()]);
     }
     setCurrentTag("");
   };
 
   const removeTag = (tagToRemove: string) => {
-    if (!article) return;
-    const newTags = (article.tags || []).filter(tag => tag !== tagToRemove);
-    updateTagsMutation.mutate(newTags);
+    setPendingTags(pendingTags.filter(tag => tag !== tagToRemove));
   };
 
   const addExistingTag = (tag: string) => {
-    if (!article) return;
-    const newTags = [...(article.tags || [])];
-    if (!newTags.includes(tag)) {
-      newTags.push(tag);
-      updateTagsMutation.mutate(newTags);
+    if (!pendingTags.includes(tag)) {
+      setPendingTags([...pendingTags, tag]);
     }
+  };
+
+  const confirmTagChanges = () => {
+    updateTagsMutation.mutate(pendingTags);
+  };
+
+  const cancelEditing = () => {
+    setIsEditingTags(false);
+    setPendingTags([]);
+    setCurrentTag("");
   };
 
   if (isLoading) {
@@ -84,7 +95,7 @@ export default function ReadPage() {
     return <div>Article not found</div>;
   }
 
-  const unusedTags = existingTags.filter(tag => !article.tags?.includes(tag));
+  const unusedTags = existingTags.filter(tag => !pendingTags.includes(tag));
 
   return (
     <div className="min-h-screen">
@@ -112,16 +123,24 @@ export default function ReadPage() {
                 size="sm"
                 variant="outline"
                 onClick={addTag}
-                disabled={updateTagsMutation.isPending}
               >
                 <Tag className="h-4 w-4" />
               </Button>
               <Button
                 size="sm"
-                variant="ghost"
-                onClick={() => setIsEditingTags(false)}
+                variant="default"
+                onClick={confirmTagChanges}
+                disabled={updateTagsMutation.isPending}
               >
-                Done
+                <Check className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={cancelEditing}
+              >
+                Cancel
               </Button>
             </div>
           ) : (
@@ -136,7 +155,7 @@ export default function ReadPage() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => setIsEditingTags(true)}
+                onClick={startEditing}
               >
                 <Tag className="h-4 w-4 mr-2" />
                 Edit Tags
@@ -155,9 +174,9 @@ export default function ReadPage() {
           <h1 className="mb-8">{article.title}</h1>
           {isEditingTags && (
             <div className="space-y-4 mb-8 not-prose">
-              {article.tags?.length > 0 && (
+              {pendingTags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {article.tags.map((tag) => (
+                  {pendingTags.map((tag) => (
                     <Badge key={tag} variant="secondary" className="gap-1">
                       {tag}
                       <button
