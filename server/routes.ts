@@ -15,6 +15,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(articles);
   });
 
+  app.get("/api/articles/tags", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    const articles = await storage.getArticles(req.user.id);
+    const tags = new Set<string>();
+    articles.forEach(article => {
+      article.tags?.forEach(tag => tags.add(tag));
+    });
+    res.json(Array.from(tags).sort());
+  });
+
   app.get("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     const article = await storage.getArticle(Number(req.params.id));

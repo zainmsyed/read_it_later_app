@@ -25,6 +25,10 @@ export default function HomePage() {
     queryKey: ["/api/articles"],
   });
 
+  const { data: existingTags = [] } = useQuery<string[]>({
+    queryKey: ["/api/articles/tags"],
+  });
+
   const form = useForm({
     defaultValues: {
       url: "",
@@ -46,6 +50,14 @@ export default function HomePage() {
     const currentTags = form.getValues("tags");
     form.setValue("tags", currentTags.filter(tag => tag !== tagToRemove));
   };
+
+  const addExistingTag = (tag: string) => {
+    const currentTags = form.getValues("tags");
+    if (!currentTags.includes(tag)) {
+      form.setValue("tags", [...currentTags, tag]);
+    }
+  };
+
 
   const addArticleMutation = useMutation({
     mutationFn: async (data: { url: string; tags: string[] }) => {
@@ -122,7 +134,7 @@ export default function HomePage() {
                       <FormItem>
                         <FormLabel>Tags</FormLabel>
                         <FormControl>
-                          <div className="space-y-2">
+                          <div className="space-y-4">
                             <div className="flex gap-2">
                               <Input
                                 value={currentTag}
@@ -146,30 +158,51 @@ export default function HomePage() {
                                 <Tag className="h-4 w-4" />
                               </Button>
                             </div>
-                            <div className="flex flex-wrap gap-2">
-                              {form.watch("tags").map((tag) => (
-                                <Badge key={tag} variant="secondary" className="gap-1">
-                                  {tag}
-                                  <button
-                                    type="button"
-                                    onClick={() => removeTag(tag)}
-                                    className="ml-1 hover:text-destructive"
-                                    disabled={addArticleMutation.isPending}
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </Badge>
-                              ))}
-                            </div>
+                            {form.watch("tags").length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {form.watch("tags").map((tag) => (
+                                  <Badge key={tag} variant="secondary" className="gap-1">
+                                    {tag}
+                                    <button
+                                      type="button"
+                                      onClick={() => removeTag(tag)}
+                                      className="ml-1 hover:text-destructive"
+                                      disabled={addArticleMutation.isPending}
+                                    >
+                                      <X className="h-3 w-3" />
+                                    </button>
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                            {existingTags.length > 0 && !form.watch("tags").length && (
+                              <div className="space-y-2">
+                                <p className="text-sm text-muted-foreground">Existing tags:</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {existingTags
+                                    .filter(tag => !form.watch("tags").includes(tag))
+                                    .map((tag) => (
+                                      <Badge
+                                        key={tag}
+                                        variant="outline"
+                                        className="cursor-pointer hover:bg-muted"
+                                        onClick={() => addExistingTag(tag)}
+                                      >
+                                        {tag}
+                                      </Badge>
+                                    ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </FormControl>
                       </FormItem>
                     )}
                   />
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
+                  <Button
+                    type="submit"
+                    className="w-full"
                     disabled={addArticleMutation.isPending}
                   >
                     {addArticleMutation.isPending ? (

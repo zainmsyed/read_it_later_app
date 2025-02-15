@@ -20,6 +20,10 @@ export default function ReadPage() {
     queryKey: [`/api/articles/${params?.id}`],
   });
 
+  const { data: existingTags = [] } = useQuery<string[]>({
+    queryKey: ["/api/articles/tags"],
+  });
+
   const updateTagsMutation = useMutation({
     mutationFn: async (tags: string[]) => {
       await apiRequest("PATCH", `/api/articles/${params?.id}`, { tags });
@@ -59,6 +63,15 @@ export default function ReadPage() {
     updateTagsMutation.mutate(newTags);
   };
 
+  const addExistingTag = (tag: string) => {
+    if (!article) return;
+    const newTags = [...(article.tags || [])];
+    if (!newTags.includes(tag)) {
+      newTags.push(tag);
+      updateTagsMutation.mutate(newTags);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -70,6 +83,8 @@ export default function ReadPage() {
   if (!article) {
     return <div>Article not found</div>;
   }
+
+  const unusedTags = existingTags.filter(tag => !article.tags?.includes(tag));
 
   return (
     <div className="min-h-screen">
@@ -138,20 +153,41 @@ export default function ReadPage() {
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
-          {isEditingTags && article.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8 not-prose">
-              {article.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="gap-1">
-                  {tag}
-                  <button
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 hover:text-destructive"
-                    disabled={updateTagsMutation.isPending}
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+          {isEditingTags && (
+            <div className="space-y-4 mb-8 not-prose">
+              {article.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {article.tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="gap-1">
+                      {tag}
+                      <button
+                        onClick={() => removeTag(tag)}
+                        className="ml-1 hover:text-destructive"
+                        disabled={updateTagsMutation.isPending}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              {unusedTags.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Existing tags:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {unusedTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-muted"
+                        onClick={() => addExistingTag(tag)}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           <div dangerouslySetInnerHTML={{ __html: article.content }} />
