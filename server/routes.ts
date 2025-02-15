@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertArticleSchema } from "@shared/schema";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
+import { and, ilike, or } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -36,17 +37,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) return res.sendStatus(401);
 
     try {
-      // First validate the URL and tags
-      const parsed = insertArticleSchema.safeParse({ 
+      const parsed = insertArticleSchema.safeParse({
         url: req.body.url,
         userId: req.user.id,
-        tags: req.body.tags || [] 
+        tags: req.body.tags || []
       });
       if (!parsed.success) {
         return res.status(400).json(parsed.error);
       }
 
-      // Fetch and parse article content
       const response = await fetch(req.body.url);
       if (!response.ok) {
         return res.status(400).json({ message: "Failed to fetch article" });
@@ -61,7 +60,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Could not parse article content" });
       }
 
-      // Create the article with parsed content and tags
       const saved = await storage.createArticle({
         userId: req.user.id,
         url: req.body.url,
@@ -110,6 +108,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) return res.sendStatus(401);
     const updated = await storage.updatePreferences(req.user.id, req.body);
     res.json(updated);
+  });
+
+  app.get("/api/articles/search", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const query = req.query.q as string;
+    const tags = req.query.tags ? (req.query.tags as string).split(",") : undefined;
+
+    try {
+      const results = await storage.searchArticles(req.user.id, query, tags);
+      res.json(results);
+    } catch (error) {
+      console.error("Error searching articles:", error);
+      res.status(500).json({ message: "Failed to search articles" });
+    }
   });
 
   const httpServer = createServer(app);

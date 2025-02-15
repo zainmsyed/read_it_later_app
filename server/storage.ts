@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, ilike, and, or, inArray } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -21,6 +21,7 @@ export interface IStorage {
   updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences>;
 
   sessionStore: session.Store;
+  searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -112,6 +113,30 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!updated) throw new Error("Preferences not found");
     return updated;
+  }
+
+  async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
+    let conditions = [eq(articles.userId, userId)];
+
+    if (query) {
+      conditions.push(
+        or(
+          ilike(articles.title, `%${query}%`),
+          ilike(articles.content, `%${query}%`),
+          ilike(articles.description, `%${query}%`)
+        )
+      );
+    }
+
+    if (tags && tags.length > 0) {
+      conditions.push(inArray(articles.tags, tags));
+    }
+
+    return db
+      .select()
+      .from(articles)
+      .where(and(...conditions))
+      .orderBy(articles.created);
   }
 }
 
