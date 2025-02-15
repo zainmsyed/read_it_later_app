@@ -99,10 +99,10 @@ export default function HomePage() {
           <h1 className="text-xl font-semibold">ReadLater</h1>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full" size="sm">
+              <Button variant="ghost" className="w-full justify-start" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Article
               </Button>
@@ -233,7 +233,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="absolute bottom-4 left-4 right-4 space-y-2">
+        <div className="absolute bottom-4 left-4 right-4 space-y-1">
           <Link href="/settings">
             <Button variant="ghost" className="w-full justify-start" size="sm">
               <Settings className="h-4 w-4 mr-2" />
