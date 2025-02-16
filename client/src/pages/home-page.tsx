@@ -48,7 +48,7 @@ export default function HomePage() {
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
-    select: (data) => data.filter(article => !article.archived)
+    select: (data) => data
   });
 
   const { data: archivedArticles, isLoading: isArchivedLoading } = useQuery<Article[]>({
@@ -308,16 +308,7 @@ export default function HomePage() {
               </Button>
             </Link>
 
-            <Link href="/archive">
-              <Button 
-                variant="ghost" 
-                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
-                size="sm"
-              >
-                <Archive className="h-4 w-4" />
-                {!isSidebarCollapsed && <span className="ml-2">Archive</span>}
-              </Button>
-            </Link>
+            
 
             {existingTags.length > 0 && !isSidebarCollapsed && (
               <div className="mt-6">

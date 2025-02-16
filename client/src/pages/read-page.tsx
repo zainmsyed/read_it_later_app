@@ -382,10 +382,7 @@ export default function ReadPage() {
             <BookOpenText className="h-4 w-4 mr-2" />
             Export Notes
           </Button>
-          <Button variant="ghost" size="sm" onClick={archiveArticle}>
-            <Archive className="h-4 w-4 mr-2" />
-            Archive
-          </Button>
+          
           <Button
             variant="ghost"
             size="sm"
