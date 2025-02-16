@@ -239,7 +239,7 @@ export default function HomePage() {
                               {form.watch("tags").length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                   {form.watch("tags").map((tag) => (
-                                    <Badge key={tag} variant="secondary" className="gap-1">
+                                    <Badge key={tag} className="tag-badge gap-1">
                                       {tag}
                                       <button
                                         type="button"
@@ -308,7 +308,7 @@ export default function HomePage() {
               </Button>
             </Link>
 
-            
+
 
             {existingTags.length > 0 && !isSidebarCollapsed && (
               <div className="mt-6">
@@ -438,8 +438,7 @@ export default function HomePage() {
                           {article.tags?.map((tag) => (
                             <Badge 
                               key={tag} 
-                              variant="secondary" 
-                              className="group cursor-pointer hover:bg-destructive/10"
+                              className="tag-badge group cursor-pointer hover:bg-destructive/10"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -544,7 +543,7 @@ export default function HomePage() {
             {pendingTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {pendingTags.map((tag) => (
-                  <Badge key={tag} variant="secondary" className="gap-1">
+                  <Badge key={tag} className="tag-badge gap-1">
                     {tag}
                     <button
                       onClick={() => setPendingTags(pendingTags.filter(t => t !== tag))}
