@@ -95,6 +95,8 @@ export default function ReadPage() {
       const text = selection.toString().trim();
       if (text) {
         setSelectedText(text);
+        setHighlightColor("yellow"); // Reset color to default
+        setHighlightNote(""); // Reset note
         setIsCreatingHighlight(true);
       }
     };
@@ -164,23 +166,32 @@ export default function ReadPage() {
     if (!selection) return;
 
     const range = selection.getRangeAt(0);
-    const container = range.commonAncestorContainer.parentElement;
-    if (!container) return;
+    const container = range.commonAncestorContainer;
 
-    // Calculate offsets relative to the article content
-    const articleContent = container.closest('.article-content');
-    if (!articleContent) return;
+    // Get the article content element
+    const articleContent = document.querySelector('.article-content');
+    if (!articleContent) {
+      console.error('Article content element not found');
+      return;
+    }
 
-    const startOffset = range.startOffset.toString();
-    const endOffset = range.endOffset.toString();
+    // Calculate text offsets
+    const text = selectedText;
+    const content = articleContent.textContent || '';
+    const startOffset = content.indexOf(text).toString();
+    const endOffset = (content.indexOf(text) + text.length).toString();
 
-    // Include the note in the highlight creation
+    if (startOffset === '-1') {
+      console.error('Could not find selected text in content');
+      return;
+    }
+
     createHighlightMutation.mutate({
       text: selectedText,
       startOffset,
       endOffset,
       color: highlightColor,
-      note: highlightNote.trim() || undefined, // Only send if there's actual content
+      note: highlightNote.trim() || undefined
     });
   };
 
