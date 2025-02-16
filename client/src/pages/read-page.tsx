@@ -622,10 +622,6 @@ export default function ReadPage() {
                         onClick={() => {
                           setHighlightNote(highlight.note || '');
                           setIsCreatingHighlight(true);
-                          updateHighlightMutation.mutate({
-                            id: highlight.id,
-                            note: highlightNote
-                          });
                         }}
                         className="text-muted-foreground"
                       >
@@ -721,6 +717,7 @@ export default function ReadPage() {
                       onClick={() => {
                         setHighlightNote(highlight.note || '');
                         setIsCreatingHighlight(true);
+                        updateHighlightMutation.mutate({id: highlight.id, note: highlightNote})
                       }}
                       className="text-muted-foreground"
                     >
