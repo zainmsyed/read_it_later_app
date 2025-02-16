@@ -36,6 +36,16 @@ export default function HomePage() {
     queryKey: ["/api/articles/tags"],
   });
 
+  const deleteArticleMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/articles/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      toast({ title: "Article deleted" });
+    },
+  });
+
   const form = useForm({
     defaultValues: {
       url: "",
@@ -431,7 +441,7 @@ export default function HomePage() {
                         onClick={(e) => {
                           e.preventDefault();
                           if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                            //deleteArticleMutation.mutate(article.id);
+                            deleteArticleMutation.mutate(article.id);
                           }
                         }}
                       >
