@@ -247,6 +247,29 @@ export default function ReadPage() {
     }, 0);
   };
 
+  const renderHighlightedContent = () => {
+    if (!article?.content || !highlights.length) {
+      return article?.content;
+    }
+
+    let content = article.content;
+    const sortedHighlights = [...highlights].sort((a, b) =>
+      parseInt(b.startOffset) - parseInt(a.startOffset)
+    );
+
+    for (const highlight of sortedHighlights) {
+      const start = parseInt(highlight.startOffset);
+      const end = parseInt(highlight.endOffset);
+
+      content = content.slice(0, start) +
+        `<span class="highlight" style="background-color: ${highlight.color}40; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
+        content.slice(end);
+    }
+
+    return content;
+  };
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -552,7 +575,10 @@ export default function ReadPage() {
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
-          <div className="article-content" dangerouslySetInnerHTML={{ __html: article.content }} />
+          <div
+            className="article-content"
+            dangerouslySetInnerHTML={{ __html: renderHighlightedContent() }}
+          />
         </article>
 
         {/* Highlights Section */}
