@@ -128,9 +128,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // First delete all highlights
-      await db.delete(highlights).where(eq(highlights.articleId, articleId));
+      await storage.deleteHighlight(articleId);
       // Then delete the article
-      await db.delete(articles).where(eq(articles.id, articleId));
+      await storage.deleteArticle(articleId);
       
       res.sendStatus(204);
     } catch (error) {
