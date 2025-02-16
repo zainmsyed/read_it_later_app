@@ -472,17 +472,7 @@ export default function HomePage() {
                       )}
                     </Link>
                     <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-blue-500"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Add archive mutation here
-                        }}
-                      >
-                        <Archive className="h-4 w-4" />
-                      </Button>
+
                       <Button
                         variant="ghost"
                         size="icon"
