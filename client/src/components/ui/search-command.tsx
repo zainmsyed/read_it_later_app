@@ -46,7 +46,7 @@ export function SearchCommandPalette({
       if (!response.ok) throw new Error("Failed to search articles");
       return response.json();
     },
-    enabled: open && (search.trim().length > 0 || selectedTags.length > 0),
+    enabled: open,
   });
 
   const { data: allTags = [] } = useQuery<string[]>({
@@ -98,7 +98,7 @@ export function SearchCommandPalette({
         />
         <CommandList>
           <CommandEmpty>No articles found.</CommandEmpty>
-          {(articles?.length > 0 || search.trim()) && (
+          {(articles && articles.length > 0) && (
             <CommandGroup heading="Articles">
               {articles.map((article) => (
                 <CommandItem
