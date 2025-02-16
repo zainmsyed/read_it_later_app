@@ -244,7 +244,7 @@ export default function HomePage() {
                                       <button
                                         type="button"
                                         onClick={() => removeTag(tag)}
-                                        className="ml-1 hover:text-destructive"
+                                        className="hover:text-destructive"
                                         disabled={addArticleMutation.isPending}
                                       >
                                         <X className="h-3 w-3" />
@@ -396,7 +396,7 @@ export default function HomePage() {
                         e.preventDefault();
                         toggleTagFilter(tag);
                       }}
-                      className="ml-1 hover:text-destructive"
+                      className="hover:text-destructive"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -547,7 +547,7 @@ export default function HomePage() {
                     {tag}
                     <button
                       onClick={() => setPendingTags(pendingTags.filter(t => t !== tag))}
-                      className="ml-1 hover:text-destructive"
+                      className="hover:text-destructive"
                     >
                       <X className="h-3 w-3" />
                     </button>
