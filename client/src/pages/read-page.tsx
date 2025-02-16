@@ -620,7 +620,9 @@ export default function ReadPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          setSelectedText(highlight.text);
                           setHighlightNote(highlight.note || '');
+                          setHighlightColor(highlight.color || 'yellow');
                           setIsCreatingHighlight(true);
                         }}
                         className="text-muted-foreground"
