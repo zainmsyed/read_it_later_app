@@ -713,8 +713,7 @@ export default function ReadPage() {
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
-          className="article-content markdown-content"
-          >
+          <div className="article-content markdown-content">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {new TurndownService({
                 headingStyle: 'atx',
