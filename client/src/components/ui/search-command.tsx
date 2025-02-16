@@ -25,17 +25,27 @@ export function SearchCommandPalette({
   const [search, setSearch] = React.useState("");
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
 
+  useEffect(() => {
+    // Reset search when closing
+    if (!open) {
+      setSearch("");
+      setSelectedTags([]);
+    }
+  }, [open]);
+
   const { data: articles = [] } = useQuery<Article[]>({
     queryKey: ["/api/articles/search", search, selectedTags],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (search) params.append("q", search);
+      if (search.trim()) params.append("q", search.trim());
       if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
-      const response = await fetch(`/api/articles/search?${params.toString()}`);
+      const response = await fetch(`/api/articles/search?${params.toString()}`, {
+        credentials: 'include' // Add credentials for authentication
+      });
       if (!response.ok) throw new Error("Failed to search articles");
       return response.json();
     },
-    enabled: open && (search.length > 0 || selectedTags.length > 0),
+    enabled: open && (search.trim().length > 0 || selectedTags.length > 0),
   });
 
   const { data: allTags = [] } = useQuery<string[]>({
@@ -65,19 +75,12 @@ export function SearchCommandPalette({
     onOpenChange(false);
   }, [onOpenChange]);
 
-  // Reset state when dialog closes
-  React.useEffect(() => {
-    if (!open) {
-      setSearch("");
-      setSelectedTags([]);
-    }
-  }, [open]);
 
   return (
     <CommandDialog open={open} onOpenChange={handleClose}>
       <Command className="rounded-lg border shadow-md">
         <CommandInput
-          placeholder="Search articles..."
+          placeholder={selectedTags.length > 0 ? "Search in filtered articles..." : "Search articles..."}
           value={search}
           onValueChange={setSearch}
         />

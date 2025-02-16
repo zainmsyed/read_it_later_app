@@ -122,18 +122,26 @@ export class DatabaseStorage implements IStorage {
     const conditions: SQL[] = [eq(articles.userId, userId)];
 
     if (query?.trim()) {
+      // Enhanced fuzzy search by breaking query into words and matching each
+      const searchTerms = query.trim().toLowerCase().split(/\s+/);
       conditions.push(
         or(
-          ilike(articles.title, `%${query.trim()}%`),
-          ilike(articles.content, `%${query.trim()}%`),
-          ilike(articles.description, `%${query.trim()}%`)
+          ...searchTerms.flatMap(term => [
+            ilike(articles.title, `%${term}%`),
+            ilike(articles.content, `%${term}%`),
+            ilike(articles.description, `%${term}%`)
+          ])
         )
       );
     }
 
     if (tags && tags.length > 0) {
-      // Use arrayContains for PostgreSQL array column
-      conditions.push(arrayContains(articles.tags, tags));
+      // Show articles that have ANY of the selected tags
+      conditions.push(
+        or(
+          ...tags.map(tag => arrayContains(articles.tags, tag))
+        )
+      );
     }
 
     return db
