@@ -23,13 +23,14 @@ export default function HomePage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  const { pathname } = window.location;
+  const isArchivePage = pathname === '/archive';
+
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
-    select: (data) => data.filter(article => !article.archived)
-  });
-
-  const { data: archivedArticles, isLoading: isArchivedLoading } = useQuery<Article[]>({
-    queryKey: ["/api/articles/archived"], // Assumed API endpoint for archived articles
+    select: (data) => data?.filter(article => 
+      isArchivePage ? article.archived : !article.archived
+    )
   });
 
   const { data: existingTags = [] } = useQuery<string[]>({
