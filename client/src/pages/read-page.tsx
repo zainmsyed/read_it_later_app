@@ -42,7 +42,7 @@ export default function ReadPage() {
       }
       buttonTimeoutRef.current = setTimeout(() => {
         setIsButtonVisible(false);
-      }, 1500);
+      }, 1000);
     };
 
     const handleScroll = () => {
@@ -793,7 +793,7 @@ export default function ReadPage() {
               onMouseLeave={() => {
                 buttonTimeoutRef.current = setTimeout(() => {
                   setIsButtonVisible(false);
-                }, 1500);
+                }, 1000);
               }}
               size="lg"
               variant="secondary"
