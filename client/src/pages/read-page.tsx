@@ -163,45 +163,47 @@ export default function ReadPage() {
 
   const createHighlight = () => {
     const selection = window.getSelection();
-    if (!selection) return;
+    if (!selection || selection.isCollapsed) return;
 
     const range = selection.getRangeAt(0);
-
-    // Get the article content element
-    const articleContent = document.querySelector('.article-content');
-    if (!articleContent) {
+    const content = document.querySelector('.article-content');
+    if (!content) {
       console.error('Article content element not found');
       return;
     }
 
-    // Function to strip HTML tags
-    const stripHtml = (html: string) => {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html;
-      return tmp.textContent || tmp.innerText || '';
-    };
+    // Get the selected text
+    const selectedTextContent = selection.toString().trim();
+    if (!selectedTextContent) return;
 
-    // Get plain text content
-    const plainContent = stripHtml(article?.content || '');
-    const plainSelection = selection.toString().trim();
+    // Create a temporary element to work with the content
+    const temp = document.createElement('div');
+    temp.innerHTML = article?.content || '';
+    const plainText = temp.textContent || '';
 
-    // Find all occurrences of the selected text
+    // Find the position in the plain text
     let startOffset = -1;
-    let currentIndex = 0;
+    const maxIterations = 100; // Safety limit
+    let iterations = 0;
+    let searchFrom = 0;
 
-    // Get the text content up to the selection start
-    const beforeRange = document.createRange();
-    beforeRange.setStart(articleContent, 0);
-    beforeRange.setEnd(range.startContainer, range.startOffset);
-    const beforeText = stripHtml(beforeRange.cloneContents().textContent || '');
+    while (startOffset === -1 && iterations < maxIterations) {
+      const found = plainText.indexOf(selectedTextContent, searchFrom);
+      if (found === -1) break;
 
-    // Find the occurrence that matches our selection position
-    while ((currentIndex = plainContent.indexOf(plainSelection, currentIndex)) !== -1) {
-      if (beforeText.length <= currentIndex) {
-        startOffset = currentIndex;
+      // Create a range up to our selection start
+      const beforeRange = document.createRange();
+      beforeRange.setStart(content, 0);
+      beforeRange.setEnd(range.startContainer, range.startOffset);
+      const beforeText = beforeRange.toString();
+
+      if (beforeText.length <= found + 50) { // Add some margin for safety
+        startOffset = found;
         break;
       }
-      currentIndex += 1;
+
+      searchFrom = found + 1;
+      iterations++;
     }
 
     if (startOffset === -1) {
@@ -213,10 +215,10 @@ export default function ReadPage() {
       return;
     }
 
-    const endOffset = startOffset + plainSelection.length;
+    const endOffset = startOffset + selectedTextContent.length;
 
     createHighlightMutation.mutate({
-      text: plainSelection,
+      text: selectedTextContent,
       startOffset: startOffset.toString(),
       endOffset: endOffset.toString(),
       color: highlightColor,
