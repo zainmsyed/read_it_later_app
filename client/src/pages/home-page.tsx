@@ -16,25 +16,24 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 
-const updateArticleMutation = useMutation({
-  mutationFn: async ({ id, data }: { id: number; data: Partial<Article> }) => {
-    const res = await apiRequest("PATCH", `/api/articles/${id}`, data);
-    if (!res.ok) {
-      throw new Error("Failed to update article");
-    }
-    return res.json();
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-    queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
-    toast({ title: "Tags updated" });
-  },
-  onError: (error: Error) => {
-    toast({ title: "Failed to update tags", description: error.message, variant: "destructive" });
-  },
-});
-
 export default function HomePage() {
+  const updateArticleMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<Article> }) => {
+      const res = await apiRequest("PATCH", `/api/articles/${id}`, data);
+      if (!res.ok) {
+        throw new Error("Failed to update article");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
+      toast({ title: "Tags updated" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to update tags", description: error.message, variant: "destructive" });
+    },
+  });
   const { user, logoutMutation } = useAuth();
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
