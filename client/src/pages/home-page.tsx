@@ -156,7 +156,7 @@ export default function HomePage() {
             {!isSidebarCollapsed && (
               <div className="flex items-center gap-2">
                 <BookOpenText className="h-6 w-6" />
-                <h1 className="text-xl font-semibold">ReadLater</h1>
+                <h1 className="text-xl font-semibold">Postea</h1>
               </div>
             )}
             <Button
