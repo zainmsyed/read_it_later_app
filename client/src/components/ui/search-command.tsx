@@ -35,16 +35,23 @@ export function SearchCommandPalette({
   }, [open]);
 
   const { data: articles = [] } = useQuery<Article[]>({
-    queryKey: ["/api/articles/search", search, selectedTags],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (search.trim()) params.append("q", search.trim());
-      if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
-      const response = await fetch(`/api/articles/search?${params.toString()}`);
-      if (!response.ok) throw new Error("Failed to search articles");
-      return response.json();
-    },
-    enabled: open && (search.trim().length > 0 || selectedTags.length > 0),
+    queryKey: ["/api/articles"],
+    enabled: open,
+    select: (data) => {
+      let filtered = data;
+      if (search.trim()) {
+        const searchLower = search.toLowerCase();
+        filtered = filtered.filter(article => 
+          article.title?.toLowerCase().includes(searchLower)
+        );
+      }
+      if (selectedTags.length > 0) {
+        filtered = filtered.filter(article => 
+          selectedTags.every(tag => article.tags?.includes(tag))
+        );
+      }
+      return filtered;
+    }
   });
 
   const { data: allTags = [] } = useQuery<string[]>({
