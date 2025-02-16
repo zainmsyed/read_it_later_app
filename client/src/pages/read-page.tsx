@@ -345,6 +345,19 @@ export default function ReadPage() {
             <Archive className="h-4 w-4 mr-2" />
             Archive
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                deleteArticleMutation.mutate();
+              }
+            }}
+            className="text-destructive hover:text-destructive"
+          >
+            <X className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
         </div>
       </header>
 
@@ -586,15 +599,18 @@ export default function ReadPage() {
                 Cancel
               </Button>
               <Button
-                variant="destructive"
-                onClick={() => {
-                  if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                    deleteArticleMutation.mutate();
-                  }
-                }}
-                disabled={deleteArticleMutation.isPending}
+                variant="default"
+                onClick={saveNotes}
+                disabled={updateArticleMutation.isPending}
               >
-                {deleteArticleMutation.isPending ? "Deleting..." : "Delete Article"}
+                {updateArticleMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Notes"
+                )}
               </Button>
             </div>
           </div>
