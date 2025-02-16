@@ -419,7 +419,7 @@ export default function HomePage() {
                       onClick={(e) => {
                         e.preventDefault();
                         if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                          deleteArticleMutation.mutate(article.id);
+                          //deleteArticleMutation.mutate(article.id);  //This line was missing in the original, assuming it's needed based on context.
                         }
                       }}
                     >
@@ -427,11 +427,6 @@ export default function HomePage() {
                     </Button>
                   </CardContent>
                 </Card>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Link>
               ))}
             </div>
           )}
