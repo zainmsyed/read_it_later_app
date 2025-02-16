@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { SearchCommandPalette } from "@/components/ui/search-command";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 
@@ -43,6 +44,7 @@ export default function HomePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -372,6 +374,13 @@ export default function HomePage() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setSearchOpen(true)}
+              >
+                <SearchIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
                 }}
@@ -614,6 +623,7 @@ export default function HomePage() {
           </div>
         </DialogContent>
       </Dialog>
+      <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }
