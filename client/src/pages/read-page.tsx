@@ -174,14 +174,35 @@ export default function ReadPage() {
       return;
     }
 
-    // Create a temporary div to store the content
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = article?.content || '';
-    const textContent = tempDiv.textContent || '';
+    // Function to strip HTML tags
+    const stripHtml = (html: string) => {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || '';
+    };
 
-    // Get the selected text and compute its position
-    const text = selectedText;
-    const startOffset = textContent.indexOf(text);
+    // Get plain text content
+    const plainContent = stripHtml(article?.content || '');
+    const plainSelection = selection.toString().trim();
+
+    // Find all occurrences of the selected text
+    let startOffset = -1;
+    let currentIndex = 0;
+
+    // Get the text content up to the selection start
+    const beforeRange = document.createRange();
+    beforeRange.setStart(articleContent, 0);
+    beforeRange.setEnd(range.startContainer, range.startOffset);
+    const beforeText = stripHtml(beforeRange.cloneContents().textContent || '');
+
+    // Find the occurrence that matches our selection position
+    while ((currentIndex = plainContent.indexOf(plainSelection, currentIndex)) !== -1) {
+      if (beforeText.length <= currentIndex) {
+        startOffset = currentIndex;
+        break;
+      }
+      currentIndex += 1;
+    }
 
     if (startOffset === -1) {
       toast({
@@ -192,10 +213,10 @@ export default function ReadPage() {
       return;
     }
 
-    const endOffset = startOffset + text.length;
+    const endOffset = startOffset + plainSelection.length;
 
     createHighlightMutation.mutate({
-      text: selectedText,
+      text: plainSelection,
       startOffset: startOffset.toString(),
       endOffset: endOffset.toString(),
       color: highlightColor,
@@ -253,6 +274,7 @@ export default function ReadPage() {
     }
 
     let content = article.content;
+    // Sort highlights in reverse order (highest offset first) to avoid position shifting
     const sortedHighlights = [...highlights].sort((a, b) =>
       parseInt(b.startOffset) - parseInt(a.startOffset)
     );
