@@ -4,12 +4,15 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote } from "lucide-react";
+import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ReadPage() {
   const [, setLocation] = useLocation();
@@ -20,6 +23,7 @@ export default function ReadPage() {
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [pendingTags, setPendingTags] = useState<string[]>([]);
   const [pendingNotes, setPendingNotes] = useState("");
+  const [noteTab, setNoteTab] = useState<"write" | "preview">("write");
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
@@ -98,6 +102,50 @@ export default function ReadPage() {
         setLocation("/");
       }
     });
+  };
+
+  const insertMarkdown = (syntax: string) => {
+    const textarea = document.querySelector('textarea');
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const selected = text.substring(start, end);
+    const after = text.substring(end);
+
+    let newText = '';
+    let newCursorPos = 0;
+
+    switch (syntax) {
+      case 'bold':
+        newText = `${before}**${selected || 'bold text'}**${after}`;
+        newCursorPos = selected ? end + 4 : start + 11;
+        break;
+      case 'italic':
+        newText = `${before}_${selected || 'italic text'}_${after}`;
+        newCursorPos = selected ? end + 2 : start + 12;
+        break;
+      case 'list':
+        newText = `${before}\n- ${selected || 'list item'}${after}`;
+        newCursorPos = selected ? end + 3 : start + 12;
+        break;
+      case 'ordered-list':
+        newText = `${before}\n1. ${selected || 'numbered item'}${after}`;
+        newCursorPos = selected ? end + 4 : start + 15;
+        break;
+      case 'quote':
+        newText = `${before}\n> ${selected || 'quoted text'}${after}`;
+        newCursorPos = selected ? end + 3 : start + 13;
+        break;
+    }
+
+    setPendingNotes(newText);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
   };
 
   if (isLoading) {
@@ -236,39 +284,106 @@ export default function ReadPage() {
       </Dialog>
 
       <Dialog open={isEditingNotes} onOpenChange={(open) => !open && cancelEditingNotes()}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
             <DialogTitle>Notes</DialogTitle>
           </DialogHeader>
-          <Textarea
-            value={pendingNotes}
-            onChange={(e) => setPendingNotes(e.target.value)}
-            placeholder="Write your notes here..."
-            className="min-h-[300px]"
-          />
-          <div className="flex justify-end gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={cancelEditingNotes}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              variant="default"
-              onClick={saveNotes}
-              disabled={updateArticleMutation.isPending}
-            >
-              {updateArticleMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                "Save Notes"
-              )}
-            </Button>
+          <Tabs value={noteTab} onValueChange={(value) => setNoteTab(value as "write" | "preview")}>
+            <div className="flex items-center justify-between mb-4">
+              <TabsList>
+                <TabsTrigger value="write">Write</TabsTrigger>
+                <TabsTrigger value="preview">Preview</TabsTrigger>
+              </TabsList>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertMarkdown('bold')}
+                  title="Bold"
+                >
+                  <Bold className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertMarkdown('italic')}
+                  title="Italic"
+                >
+                  <Italic className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertMarkdown('list')}
+                  title="Bullet List"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertMarkdown('ordered-list')}
+                  title="Numbered List"
+                >
+                  <ListOrdered className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => insertMarkdown('quote')}
+                  title="Quote"
+                >
+                  <Quote className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <TabsContent value="write" className="mt-0">
+              <Textarea
+                value={pendingNotes}
+                onChange={(e) => setPendingNotes(e.target.value)}
+                placeholder="Write your notes here using Markdown..."
+                className="min-h-[400px] font-mono"
+              />
+            </TabsContent>
+
+            <TabsContent value="preview" className="mt-0">
+              <div className="min-h-[400px] p-4 border rounded-md prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {pendingNotes || '*No content to preview*'}
+                </ReactMarkdown>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm text-muted-foreground">
+              Using Markdown syntax for formatting
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={cancelEditingNotes}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={saveNotes}
+                disabled={updateArticleMutation.isPending}
+              >
+                {updateArticleMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Notes"
+                )}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -288,6 +403,21 @@ export default function ReadPage() {
           <StickyNote className="h-5 w-5 mr-2" />
           {article.notes ? "Edit Notes" : "Add Notes"}
         </Button>
+
+        {/* Display formatted notes in the article view */}
+        {article.notes && (
+          <div className="mt-12 border-t pt-8">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+              <StickyNote className="h-5 w-5" />
+              Notes
+            </h2>
+            <div className="prose prose-sm dark:prose-invert">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {article.notes}
+              </ReactMarkdown>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
