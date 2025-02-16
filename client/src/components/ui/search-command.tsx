@@ -35,8 +35,9 @@ export function SearchCommandPalette({
   }, [open]);
 
   const { data: articles = [] } = useQuery<Article[]>({
-    queryKey: ["/api/articles"],
+    queryKey: ["/api/articles", search, selectedTags],
     enabled: open,
+    refetchOnMount: true,
     select: (data) => {
       let filtered = data;
       if (search.trim()) {
