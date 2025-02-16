@@ -61,15 +61,17 @@ export function SearchCommandPalette({
       // Text search (title, description, notes, highlights)
       if (search?.trim()) {
         const searchLower = search.toLowerCase();
-        filtered = filtered.filter(article =>
-          article.title?.toLowerCase().includes(searchLower) ||
-          article.description?.toLowerCase().includes(searchLower) ||
-          article.notes?.toLowerCase().includes(searchLower) ||
-          (article.highlights?.some(h =>
+        filtered = filtered.filter(article => {
+          const hasHighlightMatch = Array.isArray(article.highlights) && article.highlights.some(h =>
             h.text.toLowerCase().includes(searchLower) ||
-            h.note?.toLowerCase().includes(searchLower)
-          ) || false)
-        );
+            (h.note && h.note.toLowerCase().includes(searchLower))
+          );
+          
+          return article.title?.toLowerCase().includes(searchLower) ||
+                 article.description?.toLowerCase().includes(searchLower) ||
+                 article.notes?.toLowerCase().includes(searchLower) ||
+                 hasHighlightMatch;
+        });
       }
 
       // Tag filtering
