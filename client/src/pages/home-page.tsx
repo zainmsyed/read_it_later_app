@@ -15,6 +15,17 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
+// Assume this storage object exists and handles article updates.  Implementation details omitted.
+const storage = {
+  updateArticle: async (id: number, data: Partial<Article>) => {
+    //Implementation to update article data.  This would typically involve a fetch call or similar.
+    const res = await apiRequest("PUT", `/api/articles/${id}`, data)
+    if (!res.ok){
+      throw new Error("Failed to update article")
+    }
+  }
+}
+
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
@@ -414,11 +425,50 @@ export default function HomePage() {
                       )}
                       {article.tags && article.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2">
-                          {article.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary">
+                          {article.tags?.map((tag) => (
+                            <Badge 
+                              key={tag} 
+                              variant="secondary" 
+                              className="group cursor-pointer hover:bg-destructive/10"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (confirm(`Remove tag "${tag}"?`)) {
+                                  const updatedTags = article.tags?.filter(t => t !== tag);
+                                  storage.updateArticle(article.id, { tags: updatedTags })
+                                    .then(() => {
+                                      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+                                      queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
+                                      toast({ title: "Tag removed" });
+                                    });
+                                }
+                              }}
+                            >
                               {tag}
+                              <X className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100" />
                             </Badge>
                           ))}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const newTag = prompt("Enter new tag:");
+                              if (newTag?.trim()) {
+                                const updatedTags = [...(article.tags || []), newTag.trim()];
+                                storage.updateArticle(article.id, { tags: updatedTags })
+                                  .then(() => {
+                                    queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+                                    queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
+                                    toast({ title: "Tag added" });
+                                  });
+                              }
+                            }}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
                         </div>
                       )}
                     </Link>
