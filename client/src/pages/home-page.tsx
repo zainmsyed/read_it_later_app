@@ -25,6 +25,7 @@ export default function HomePage() {
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
+    select: (data) => data.filter(article => !article.archived)
   });
 
   const { data: existingTags = [] } = useQuery<string[]>({

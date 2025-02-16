@@ -184,7 +184,8 @@ export default function ReadPage() {
     setPendingNotes(article?.notes || "");
   };
 
-  const archiveArticle = () => {
+  const archiveArticle = (e: React.MouseEvent) => {
+    e.preventDefault();
     updateArticleMutation.mutate({ archived: true }, {
       onSuccess: () => {
         toast({ title: "Article archived" });
