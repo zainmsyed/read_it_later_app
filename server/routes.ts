@@ -34,15 +34,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const tags = tagsQuery ? tagsQuery.split(",").filter(Boolean) : [];
     
     const articles = await storage.getArticles(req.user.id);
-    
-    const filtered = articles.filter(article => {
+    const searchResults = [];
+
+    for (const article of articles) {
+      // Check tags first
       if (tags.length > 0 && (!article.tags || !tags.every(tag => article.tags.includes(tag)))) {
-        return false;
+        continue;
       }
-      return !q || article.title?.toLowerCase().includes(q.toLowerCase());
-    });
+
+      // If no search query, include all articles that match tags
+      if (!q) {
+        searchResults.push(article);
+        continue;
+      }
+
+      const query = q.toLowerCase();
+      const highlights = await storage.getHighlights(article.id);
+      
+      // Check title, notes, and highlights
+      if (
+        article.title?.toLowerCase().includes(query) ||
+        article.notes?.toLowerCase().includes(query) ||
+        highlights.some(h => 
+          h.text.toLowerCase().includes(query) || 
+          h.note?.toLowerCase().includes(query)
+        )
+      ) {
+        searchResults.push(article);
+      }
+    }
     
-    res.json(filtered);
+    res.json(searchResults);
   });
 
   app.get("/api/articles/:id", async (req, res) => {

@@ -24,6 +24,11 @@ interface SearchFilters {
   dateRange: DateFilter;
 }
 
+interface ArticleWithHighlights extends Article {
+  highlights?: { text: string; note?: string }[];
+  notes?: string;
+}
+
 export function SearchCommandPalette({
   open,
   onOpenChange,
@@ -47,24 +52,29 @@ export function SearchCommandPalette({
     }
   }, [open]);
 
-  const { data: articles = [] } = useQuery<Article[]>({
+  const { data: articles = [] } = useQuery<ArticleWithHighlights[]>({
     queryKey: ["/api/articles"],
     enabled: open,
     select: (data) => {
       let filtered = data || [];
 
-      // Text search
+      // Text search (title, description, notes, highlights)
       if (search?.trim()) {
         const searchLower = search.toLowerCase();
-        filtered = filtered.filter(article => 
+        filtered = filtered.filter(article =>
           article.title?.toLowerCase().includes(searchLower) ||
-          article.description?.toLowerCase().includes(searchLower)
+          article.description?.toLowerCase().includes(searchLower) ||
+          article.notes?.toLowerCase().includes(searchLower) ||
+          (article.highlights?.some(h =>
+            h.text.toLowerCase().includes(searchLower) ||
+            h.note?.toLowerCase().includes(searchLower)
+          ) || false)
         );
       }
 
       // Tag filtering
       if (filters.tags.length > 0) {
-        filtered = filtered.filter(article => 
+        filtered = filtered.filter(article =>
           filters.tags.every(tag => article.tags?.includes(tag))
         );
       }
@@ -205,7 +215,7 @@ export function SearchCommandPalette({
               {articles.map((article) => (
                 <CommandItem
                   key={article.id}
-                  value={article.title}
+                  value={`${article.title} ${article.tags?.join(" ")} ${article.notes || ""}`}
                   onSelect={() => handleSelect(article.id.toString())}
                   className="cursor-pointer"
                 >
@@ -231,6 +241,19 @@ export function SearchCommandPalette({
                         </div>
                       )}
                     </div>
+                    {search && article.notes?.toLowerCase().includes(search.toLowerCase()) && (
+                      <span className="text-sm text-muted-foreground mt-1">
+                        Matches in notes
+                      </span>
+                    )}
+                    {search && article.highlights?.some(h =>
+                      h.text.toLowerCase().includes(search.toLowerCase()) ||
+                      h.note?.toLowerCase().includes(search.toLowerCase())
+                    ) && (
+                      <span className="text-sm text-muted-foreground mt-1">
+                        Matches in highlights
+                      </span>
+                    )}
                   </div>
                 </CommandItem>
               ))}
