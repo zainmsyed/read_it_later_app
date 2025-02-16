@@ -393,10 +393,10 @@ export default function HomePage() {
           ) : (
             <div className="space-y-4">
               {filteredArticles?.map((article) => (
-                <Link key={article.id} href={`/read/${article.id}`}>
-                  <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-                    <CardContent className="p-6">
-                      <CardTitle className="mb-2">{article.title}</CardTitle>
+                <Card key={article.id} className="hover:bg-muted/50 transition-colors">
+                  <CardContent className="p-6 flex justify-between items-start">
+                    <Link href={`/read/${article.id}`} className="flex-1">
+                      <CardTitle className="mb-2 hover:text-primary">{article.title}</CardTitle>
                       {article.description && (
                         <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
                           {article.description}
@@ -409,6 +409,24 @@ export default function HomePage() {
                               {tag}
                             </Badge>
                           ))}
+                        </div>
+                      )}
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="ml-4 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                          deleteArticleMutation.mutate(article.id);
+                        }
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
                         </div>
                       )}
                     </CardContent>
