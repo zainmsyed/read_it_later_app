@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and, or, SQL, sql, desc } from "drizzle-orm";
+import { eq, and, or, SQL, ilike, desc } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -44,21 +44,23 @@ export class DatabaseStorage implements IStorage {
     try {
       let conditions: SQL[] = [eq(articles.userId, userId)];
 
-      // Text search using PostgreSQL's full-text search with trigram similarity
+      // Fuzzy search using ILIKE for partial matches
       if (query?.trim()) {
-        const searchQuery = query.trim().toLowerCase();
+        const searchTerm = `%${query.trim().toLowerCase()}%`;
         conditions.push(
           or(
-            sql`similarity(${articles.title}, ${searchQuery}) > 0.3`,
-            sql`similarity(${articles.content}, ${searchQuery}) > 0.3`,
-            sql`similarity(COALESCE(${articles.description}, ''), ${searchQuery}) > 0.3`
+            ilike(articles.title, searchTerm),
+            ilike(articles.content, searchTerm),
+            ilike(articles.description || '', searchTerm)
           )
         );
       }
 
       // Tag filtering - articles must have ALL specified tags
       if (tags?.length) {
-        conditions.push(sql`${articles.tags} ?& array[${sql.join(tags)}]`);
+        tags.forEach(tag => {
+          conditions.push(sql`${articles.tags} @> ARRAY[${tag}]::text[]`);
+        });
       }
 
       const results = await db
