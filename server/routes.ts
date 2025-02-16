@@ -152,6 +152,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/articles/:id/markdown", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
+
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
+
+      const highlights = await storage.getHighlights(articleId);
+      
+      let markdown = `# ${article.title}\n\n`;
+      markdown += `[Original Article](${article.url})\n\n`;
+      
+      if (article.tags && article.tags.length > 0) {
+        markdown += `Tags: ${article.tags.join(", ")}\n\n`;
+      }
+
+      markdown += `## Content\n\n${article.content}\n\n`;
+
+      if (highlights.length > 0) {
+        markdown += `## Highlights\n\n`;
+        highlights.forEach(highlight => {
+          markdown += `> ${highlight.text}\n\n`;
+          if (highlight.note) {
+            markdown += `Note: ${highlight.note}\n\n`;
+          }
+        });
+      }
+
+      if (article.notes) {
+        markdown += `## Notes\n\n${article.notes}\n`;
+      }
+
+      res.header('Content-Type', 'text/markdown');
+      res.header('Content-Disposition', `attachment; filename="${article.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md"`);
+      res.send(markdown);
+    } catch (error) {
+      console.error("Error exporting article:", error);
+      res.status(500).json({ message: "Failed to export article" });
+    }
+  });
+
   app.get("/api/articles/:id/highlights", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 

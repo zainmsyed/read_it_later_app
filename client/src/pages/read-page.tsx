@@ -4,7 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter } from "lucide-react";
+import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, BookOpenText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -318,10 +318,20 @@ export default function ReadPage() {
             Edit Tags
           </Button>
         </div>
-        <Button variant="ghost" size="sm" onClick={archiveArticle}>
-          <Archive className="h-4 w-4 mr-2" />
-          Archive
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
+          >
+            <BookOpenText className="h-4 w-4 mr-2" />
+            Export MD
+          </Button>
+          <Button variant="ghost" size="sm" onClick={archiveArticle}>
+            <Archive className="h-4 w-4 mr-2" />
+            Archive
+          </Button>
+        </div>
       </header>
 
       {/* Highlight Creation Dialog */}
