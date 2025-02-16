@@ -166,7 +166,6 @@ export default function ReadPage() {
     if (!selection) return;
 
     const range = selection.getRangeAt(0);
-    const container = range.commonAncestorContainer;
 
     // Get the article content element
     const articleContent = document.querySelector('.article-content');
@@ -175,21 +174,30 @@ export default function ReadPage() {
       return;
     }
 
-    // Calculate text offsets
-    const text = selectedText;
-    const content = articleContent.textContent || '';
-    const startOffset = content.indexOf(text).toString();
-    const endOffset = (content.indexOf(text) + text.length).toString();
+    // Create a temporary div to store the content
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = article?.content || '';
+    const textContent = tempDiv.textContent || '';
 
-    if (startOffset === '-1') {
-      console.error('Could not find selected text in content');
+    // Get the selected text and compute its position
+    const text = selectedText;
+    const startOffset = textContent.indexOf(text);
+
+    if (startOffset === -1) {
+      toast({
+        title: "Error",
+        description: "Could not determine the position of the selected text. Please try selecting the text again.",
+        variant: "destructive"
+      });
       return;
     }
 
+    const endOffset = startOffset + text.length;
+
     createHighlightMutation.mutate({
       text: selectedText,
-      startOffset,
-      endOffset,
+      startOffset: startOffset.toString(),
+      endOffset: endOffset.toString(),
       color: highlightColor,
       note: highlightNote.trim() || undefined
     });
