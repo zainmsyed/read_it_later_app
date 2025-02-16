@@ -219,7 +219,7 @@ export default function ReadPage() {
   };
 
   const createHighlight = () => {
-    if (!selectionRange || !selectedText) {
+    if ((!selectionRange || !selectedText) && !isCreatingHighlight) {
       toast({
         title: "Error",
         description: "Please select some text first",
@@ -230,8 +230,8 @@ export default function ReadPage() {
 
     createHighlightMutation.mutate({
       text: selectedText,
-      startOffset: selectionRange.start.toString(),
-      endOffset: selectionRange.end.toString(),
+      startOffset: selectionRange?.start.toString() || "0",
+      endOffset: selectionRange?.end.toString() || "0",
       color: highlightColor,
       note: highlightNote.trim() || undefined
     });
@@ -719,6 +719,7 @@ export default function ReadPage() {
                         setSelectedText(highlight.text);
                         setIsCreatingHighlight(true);
                         setSelectionRange({ start: parseInt(highlight.startOffset), end: parseInt(highlight.endOffset) });
+                        setHighlightColor(highlight.color || 'yellow');
                       }}
                       className="text-muted-foreground"
                     >
