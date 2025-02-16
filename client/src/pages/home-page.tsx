@@ -412,19 +412,32 @@ export default function HomePage() {
                         </div>
                       )}
                     </Link>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="ml-4 text-muted-foreground hover:text-destructive"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                          //deleteArticleMutation.mutate(article.id);  //This line was missing in the original, assuming it's needed based on context.
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-blue-500"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Add archive mutation here
+                        }}
+                      >
+                        <Archive className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                            //deleteArticleMutation.mutate(article.id);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
