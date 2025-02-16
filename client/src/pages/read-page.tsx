@@ -103,7 +103,6 @@ export default function ReadPage() {
     return () => document.removeEventListener('mouseup', handleSelection);
   }, []);
 
-  // Rest of the tag-related functions remain unchanged
   const startEditing = () => {
     setPendingTags(article?.tags || []);
     setIsEditingTags(true);
@@ -175,12 +174,13 @@ export default function ReadPage() {
     const startOffset = range.startOffset.toString();
     const endOffset = range.endOffset.toString();
 
+    // Include the note in the highlight creation
     createHighlightMutation.mutate({
       text: selectedText,
       startOffset,
       endOffset,
       color: highlightColor,
-      note: highlightNote,
+      note: highlightNote.trim() || undefined, // Only send if there's actual content
     });
   };
 
@@ -549,13 +549,15 @@ export default function ReadPage() {
                   key={highlight.id}
                   className="p-4 border rounded-lg space-y-2"
                   style={{
-                    borderColor: highlight.color,
-                    backgroundColor: `${highlight.color}10`
+                    borderColor: highlight.color || 'yellow',
+                    backgroundColor: `${highlight.color || 'yellow'}10`
                   }}
                 >
                   <p className="text-lg">{highlight.text}</p>
                   {highlight.note && (
-                    <p className="text-sm text-muted-foreground">{highlight.note}</p>
+                    <p className="text-sm text-muted-foreground border-t pt-2 mt-2">
+                      {highlight.note}
+                    </p>
                   )}
                   <Button
                     variant="ghost"
