@@ -89,7 +89,7 @@ export function SearchCommandPalette({
         }
 
         filtered = filtered.filter(article => {
-          const articleDate = new Date(article.createdAt);
+          const articleDate = new Date(article.created);
           return isWithinInterval(articleDate, {
             start: startDate,
             end: endOfDay(now)
@@ -219,7 +219,7 @@ export function SearchCommandPalette({
                     )}
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">
-                        {format(new Date(article.createdAt), 'MMM d, yyyy')}
+                        {format(new Date(article.created), 'MMM d, yyyy')}
                       </span>
                       {article.tags && article.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
