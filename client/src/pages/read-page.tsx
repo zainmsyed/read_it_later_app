@@ -764,7 +764,11 @@ export default function ReadPage() {
               variant="secondary"
               onClick={() => {
                 const highlightsSection = document.querySelector('h2:has(.h-5.w-5)');
-                highlightsSection?.scrollIntoView({ behavior: 'smooth' });
+                if (highlightsSection) {
+                  const yOffset = -16; // Add some padding from the top
+                  const y = highlightsSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                  window.scrollTo({ top: y, behavior: 'smooth' });
+                }
               }}
             >
               <ArrowLeft className="h-5 w-5 rotate-[270deg] mr-2" />
