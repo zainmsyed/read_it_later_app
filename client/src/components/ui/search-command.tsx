@@ -12,6 +12,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SearchIcon, Tag } from "lucide-react";
 
 export function SearchCommandPalette({
@@ -132,6 +133,22 @@ export function SearchCommandPalette({
             </CommandGroup>
           )}
         </CommandList>
+        {selectedTags.length > 0 && (
+          <div className="p-4 border-t flex justify-end gap-2">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => {
+                if (articles.length > 0 && articles[0].id) {
+                  setLocation(`/read/${articles[0].id}`);
+                  handleClose();
+                }
+              }}
+            >
+              Search
+            </Button>
+          </div>
+        )}
       </Command>
     </CommandDialog>
   );
