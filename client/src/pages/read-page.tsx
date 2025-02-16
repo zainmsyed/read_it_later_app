@@ -82,6 +82,19 @@ export default function ReadPage() {
     },
   });
 
+  const deleteArticleMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("DELETE", `/api/articles/${params?.id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      toast({ title: "Article deleted" });
+      setLocation("/");
+    },
+  });
+
+
   useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
@@ -567,26 +580,21 @@ export default function ReadPage() {
             </div>
             <div className="flex gap-2">
               <Button
-                size="sm"
                 variant="ghost"
-                onClick={cancelEditingNotes}
+                onClick={() => setIsEditingNotes(false)}
               >
                 Cancel
               </Button>
               <Button
-                size="sm"
-                variant="default"
-                onClick={saveNotes}
-                disabled={updateArticleMutation.isPending}
+                variant="destructive"
+                onClick={() => {
+                  if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                    deleteArticleMutation.mutate();
+                  }
+                }}
+                disabled={deleteArticleMutation.isPending}
               >
-                {updateArticleMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Notes"
-                )}
+                {deleteArticleMutation.isPending ? "Deleting..." : "Delete Article"}
               </Button>
             </div>
           </div>
