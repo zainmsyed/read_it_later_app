@@ -759,7 +759,7 @@ export default function ReadPage() {
           
           {(highlights.length > 0 || article.notes) && (
             <Button
-              className="fixed right-8 bottom-8 shadow-lg"
+              className="fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg"
               size="lg"
               variant="secondary"
               onClick={() => {
