@@ -1,16 +1,17 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Article } from "@shared/schema";
+import { Article, Highlight } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote } from "lucide-react";
+import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -21,12 +22,21 @@ export default function ReadPage() {
   const [currentTag, setCurrentTag] = useState("");
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [isCreatingHighlight, setIsCreatingHighlight] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+  const [highlightColor, setHighlightColor] = useState<string>("yellow");
+  const [highlightNote, setHighlightNote] = useState("");
   const [pendingTags, setPendingTags] = useState<string[]>([]);
   const [pendingNotes, setPendingNotes] = useState("");
   const [noteTab, setNoteTab] = useState<"write" | "preview">("write");
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
+  });
+
+  const { data: highlights = [] } = useQuery<Highlight[]>({
+    queryKey: [`/api/articles/${params?.id}/highlights`],
+    enabled: !!params?.id,
   });
 
   const { data: existingTags = [] } = useQuery<string[]>({
@@ -47,7 +57,53 @@ export default function ReadPage() {
     },
   });
 
-  // Initialize pending tags when entering edit mode
+  const createHighlightMutation = useMutation({
+    mutationFn: async (data: { text: string; startOffset: string; endOffset: string; color?: string; note?: string }) => {
+      await apiRequest("POST", `/api/articles/${params?.id}/highlights`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}/highlights`] });
+      toast({ title: "Highlight saved" });
+      setIsCreatingHighlight(false);
+      setSelectedText("");
+      setHighlightColor("yellow");
+      setHighlightNote("");
+    },
+  });
+
+  const deleteHighlightMutation = useMutation({
+    mutationFn: async (highlightId: number) => {
+      await apiRequest("DELETE", `/api/highlights/${highlightId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}/highlights`] });
+      toast({ title: "Highlight deleted" });
+    },
+  });
+
+  useEffect(() => {
+    const handleSelection = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) return;
+
+      const range = selection.getRangeAt(0);
+      const content = range.commonAncestorContainer.parentElement;
+
+      // Only allow highlighting within the article content
+      if (!content?.closest('.article-content')) return;
+
+      const text = selection.toString().trim();
+      if (text) {
+        setSelectedText(text);
+        setIsCreatingHighlight(true);
+      }
+    };
+
+    document.addEventListener('mouseup', handleSelection);
+    return () => document.removeEventListener('mouseup', handleSelection);
+  }, []);
+
+  // Rest of the tag-related functions remain unchanged
   const startEditing = () => {
     setPendingTags(article?.tags || []);
     setIsEditingTags(true);
@@ -101,6 +157,30 @@ export default function ReadPage() {
         toast({ title: "Article archived" });
         setLocation("/");
       }
+    });
+  };
+
+  const createHighlight = () => {
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const range = selection.getRangeAt(0);
+    const container = range.commonAncestorContainer.parentElement;
+    if (!container) return;
+
+    // Calculate offsets relative to the article content
+    const articleContent = container.closest('.article-content');
+    if (!articleContent) return;
+
+    const startOffset = range.startOffset.toString();
+    const endOffset = range.endOffset.toString();
+
+    createHighlightMutation.mutate({
+      text: selectedText,
+      startOffset,
+      endOffset,
+      color: highlightColor,
+      note: highlightNote,
     });
   };
 
@@ -192,6 +272,67 @@ export default function ReadPage() {
         </Button>
       </header>
 
+      {/* Highlight Creation Dialog */}
+      <Dialog open={isCreatingHighlight} onOpenChange={(open) => !open && setIsCreatingHighlight(false)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create Highlight</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Selected Text:</label>
+              <p className="text-sm border rounded-md p-2 bg-muted">{selectedText}</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Color:</label>
+              <Select value={highlightColor} onValueChange={setHighlightColor}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yellow">Yellow</SelectItem>
+                  <SelectItem value="green">Green</SelectItem>
+                  <SelectItem value="blue">Blue</SelectItem>
+                  <SelectItem value="pink">Pink</SelectItem>
+                  <SelectItem value="purple">Purple</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Note (optional):</label>
+              <Textarea
+                value={highlightNote}
+                onChange={(e) => setHighlightNote(e.target.value)}
+                placeholder="Add a note to your highlight..."
+                className="h-24"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setIsCreatingHighlight(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={createHighlight}
+                disabled={createHighlightMutation.isPending}
+              >
+                {createHighlightMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Highlight"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tag Editing Dialog */}
       <Dialog open={isEditingTags} onOpenChange={(open) => !open && cancelEditing()}>
         <DialogContent className="sm:max-w-[425px] gap-6">
           <div className="space-y-4">
@@ -283,6 +424,7 @@ export default function ReadPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Notes Dialog */}
       <Dialog open={isEditingNotes} onOpenChange={(open) => !open && cancelEditingNotes()}>
         <DialogContent className="sm:max-w-[800px]">
           <DialogHeader>
@@ -391,8 +533,44 @@ export default function ReadPage() {
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: article.content }} />
+          <div className="article-content" dangerouslySetInnerHTML={{ __html: article.content }} />
         </article>
+
+        {/* Highlights Section */}
+        {highlights.length > 0 && (
+          <div className="mt-12 border-t pt-8">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+              <Highlighter className="h-5 w-5" />
+              Highlights
+            </h2>
+            <div className="space-y-4">
+              {highlights.map((highlight) => (
+                <div
+                  key={highlight.id}
+                  className="p-4 border rounded-lg space-y-2"
+                  style={{
+                    borderColor: highlight.color,
+                    backgroundColor: `${highlight.color}10`
+                  }}
+                >
+                  <p className="text-lg">{highlight.text}</p>
+                  {highlight.note && (
+                    <p className="text-sm text-muted-foreground">{highlight.note}</p>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteHighlightMutation.mutate(highlight.id)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Floating Notes Button */}
         <Button

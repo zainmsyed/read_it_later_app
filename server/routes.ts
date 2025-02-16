@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertArticleSchema } from "@shared/schema";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
+import { insertHighlightSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -148,6 +149,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating preferences:", error);
       res.status(500).json({ message: "Failed to update preferences" });
+    }
+  });
+
+  app.get("/api/articles/:id/highlights", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
+
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
+
+      const highlights = await storage.getHighlights(articleId);
+      res.json(highlights);
+    } catch (error) {
+      console.error("Error fetching highlights:", error);
+      res.status(500).json({ message: "Failed to fetch highlights" });
+    }
+  });
+
+  app.post("/api/articles/:id/highlights", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const articleId = parseInt(req.params.id);
+    if (isNaN(articleId)) {
+      return res.status(400).json({ message: "Invalid article ID" });
+    }
+
+    try {
+      const article = await storage.getArticle(articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(404).json({ message: "Article not found" });
+      }
+
+      const parsed = insertHighlightSchema.safeParse({
+        ...req.body,
+        articleId,
+        userId: req.user.id,
+      });
+
+      if (!parsed.success) {
+        return res.status(400).json(parsed.error);
+      }
+
+      const highlight = await storage.createHighlight(parsed.data);
+      res.status(201).json(highlight);
+    } catch (error) {
+      console.error("Error creating highlight:", error);
+      res.status(500).json({ message: "Failed to create highlight" });
+    }
+  });
+
+  app.patch("/api/highlights/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const highlightId = parseInt(req.params.id);
+    if (isNaN(highlightId)) {
+      return res.status(400).json({ message: "Invalid highlight ID" });
+    }
+
+    try {
+      const highlight = await storage.getHighlight(highlightId);
+      if (!highlight) {
+        return res.status(404).json({ message: "Highlight not found" });
+      }
+
+      const article = await storage.getArticle(highlight.articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+
+      const updated = await storage.updateHighlight(highlightId, req.body);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating highlight:", error);
+      res.status(500).json({ message: "Failed to update highlight" });
+    }
+  });
+
+  app.delete("/api/highlights/:id", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    const highlightId = parseInt(req.params.id);
+    if (isNaN(highlightId)) {
+      return res.status(400).json({ message: "Invalid highlight ID" });
+    }
+
+    try {
+      const highlight = await storage.getHighlight(highlightId);
+      if (!highlight) {
+        return res.status(404).json({ message: "Highlight not found" });
+      }
+
+      const article = await storage.getArticle(highlight.articleId);
+      if (!article || article.userId !== req.user.id) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+
+      await storage.deleteHighlight(highlightId);
+      res.sendStatus(204);
+    } catch (error) {
+      console.error("Error deleting highlight:", error);
+      res.status(500).json({ message: "Failed to delete highlight" });
     }
   });
 

@@ -1,8 +1,8 @@
-import { users, articles, preferences, type User, type InsertUser, type Article, type InsertArticle, type Preferences, type InsertPreferences } from "@shared/schema";
+import { users, articles, preferences, highlights, type User, type InsertUser, type Article, type InsertArticle, type Preferences, type InsertPreferences, type Highlight, type InsertHighlight } from "@shared/schema";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -16,6 +16,12 @@ export interface IStorage {
   createArticle(article: InsertArticle): Promise<Article>;
   updateArticle(id: number, article: Partial<Article>): Promise<Article>;
   deleteArticle(id: number): Promise<void>;
+
+  getHighlights(articleId: number): Promise<Highlight[]>;
+  getHighlight(id: number): Promise<Highlight | undefined>;
+  createHighlight(highlight: InsertHighlight): Promise<Highlight>;
+  updateHighlight(id: number, highlight: Partial<Highlight>): Promise<Highlight>;
+  deleteHighlight(id: number): Promise<void>;
 
   getPreferences(userId: number): Promise<Preferences>;
   updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences>;
@@ -84,6 +90,44 @@ export class DatabaseStorage implements IStorage {
 
   async deleteArticle(id: number): Promise<void> {
     await db.delete(articles).where(eq(articles.id, id));
+  }
+
+  async getHighlights(articleId: number): Promise<Highlight[]> {
+    return db
+      .select()
+      .from(highlights)
+      .where(eq(highlights.articleId, articleId))
+      .orderBy(desc(highlights.created));
+  }
+
+  async getHighlight(id: number): Promise<Highlight | undefined> {
+    const [highlight] = await db
+      .select()
+      .from(highlights)
+      .where(eq(highlights.id, id));
+    return highlight;
+  }
+
+  async createHighlight(insertHighlight: InsertHighlight): Promise<Highlight> {
+    const [highlight] = await db
+      .insert(highlights)
+      .values(insertHighlight)
+      .returning();
+    return highlight;
+  }
+
+  async updateHighlight(id: number, highlight: Partial<Highlight>): Promise<Highlight> {
+    const [updated] = await db
+      .update(highlights)
+      .set(highlight)
+      .where(eq(highlights.id, id))
+      .returning();
+    if (!updated) throw new Error("Highlight not found");
+    return updated;
+  }
+
+  async deleteHighlight(id: number): Promise<void> {
+    await db.delete(highlights).where(eq(highlights.id, id));
   }
 
   async getPreferences(userId: number): Promise<Preferences> {
