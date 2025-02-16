@@ -691,7 +691,7 @@ export default function ReadPage() {
 
         {/* Highlights Section */}
         {highlights.length > 0 && (
-          <div id="highlights-section" className="mt-12 border-t pt-8">
+          <div className="mt-12 border-t pt-8">
             <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
               <Highlighter className="h-5 w-5" />
               Highlights
@@ -746,39 +746,19 @@ export default function ReadPage() {
           </div>
         )}
 
-        {/* Floating Buttons */}
-        <div className="fixed right-8 flex flex-col gap-4">
-          <Button
-            className="top-1/2 transform -translate-y-1/2 shadow-lg"
-            size="lg"
-            onClick={startEditingNotes}
-          >
-            <StickyNote className="h-5 w-5 mr-2" />
-            {article.notes ? "Edit Notes" : "Add Notes"}
-          </Button>
-          
-          {(highlights.length > 0 || article.notes) && (
-            <Button
-              className="bottom-8 shadow-lg"
-              size="lg"
-              variant="secondary"
-              onClick={() => {
-                const highlightsSection = document.querySelector('#highlights-section');
-                const notesSection = document.querySelector('#notes-section');
-                const target = highlightsSection || notesSection;
-                
-                target?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              <ArrowLeft className="h-5 w-5 rotate-90 mr-2" />
-              Jump to Annotations
-            </Button>
-          )}
-        </div>
+        {/* Floating Notes Button */}
+        <Button
+          className="fixed right-8 top-1/2 transform -translate-y-1/2 shadow-lg"
+          size="lg"
+          onClick={startEditingNotes}
+        >
+          <StickyNote className="h-5 w-5 mr-2" />
+          {article.notes ? "Edit Notes" : "Add Notes"}
+        </Button>
 
         {/* Display formatted notes in the article view */}
         {article.notes && (
-          <div id="notes-section" className="mt-12 border-t pt-8">
+          <div className="mt-12 border-t pt-8">
             <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
               <StickyNote className="h-5 w-5" />
               Notes
