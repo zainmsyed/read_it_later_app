@@ -70,6 +70,13 @@ export function SearchCommandPalette({
     }
   }, [setLocation]);
 
+  const handleSearch = React.useCallback(() => {
+    if (articles.length > 0 && articles[0].id) {
+      setLocation(`/read/${articles[0].id}`);
+      handleClose();
+    }
+  }, [articles, setLocation]);
+
   const handleClose = React.useCallback(() => {
     setSearch("");
     setSelectedTags([]);
@@ -83,6 +90,11 @@ export function SearchCommandPalette({
           placeholder={selectedTags.length > 0 ? "Search in filtered articles..." : "Search articles..."}
           value={search}
           onValueChange={setSearch}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && articles.length > 0) {
+              handleSearch();
+            }
+          }}
         />
         <CommandList>
           <CommandEmpty>No articles found.</CommandEmpty>
@@ -138,12 +150,7 @@ export function SearchCommandPalette({
             <Button
               variant="default"
               size="sm"
-              onClick={() => {
-                if (articles.length > 0 && articles[0].id) {
-                  setLocation(`/read/${articles[0].id}`);
-                  handleClose();
-                }
-              }}
+              onClick={handleSearch}
             >
               Search
             </Button>
