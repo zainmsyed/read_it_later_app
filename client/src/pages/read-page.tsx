@@ -767,7 +767,7 @@ export default function ReadPage() {
                 highlightsSection?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <ArrowLeft className="h-5 w-5 rotate-180 mr-2" />
+              <ArrowLeft className="h-5 w-5 rotate-[270deg] mr-2" />
               Jump to Annotations
             </Button>
           )}
