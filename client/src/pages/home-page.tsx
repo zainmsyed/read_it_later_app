@@ -28,6 +28,11 @@ const storage = {
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
+  const [isEditingTags, setIsEditingTags] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const [pendingTags, setPendingTags] = useState<string[]>([]);
+  const [currentTag, setCurrentTag] = useState("");
+  const { toast } = useToast();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTag, setCurrentTag] = useState("");
@@ -455,16 +460,9 @@ export default function HomePage() {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              const newTag = prompt("Enter new tag:");
-                              if (newTag?.trim()) {
-                                const updatedTags = [...(article.tags || []), newTag.trim()];
-                                storage.updateArticle(article.id, { tags: updatedTags })
-                                  .then(() => {
-                                    queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-                                    queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
-                                    toast({ title: "Tag added" });
-                                  });
-                              }
+                              setEditingArticle(article);
+                              setPendingTags(article.tags || []);
+                              setIsEditingTags(true);
                             }}
                           >
                             <Plus className="h-4 w-4" />
@@ -505,6 +503,114 @@ export default function HomePage() {
           )}
         </div>
       </div>
+    {/* Tag Editing Dialog */}
+      <Dialog open={isEditingTags} onOpenChange={(open) => !open && setIsEditingTags(false)}>
+        <DialogContent className="sm:max-w-[425px] gap-6">
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!currentTag.trim()) return;
+                    if (!pendingTags.includes(currentTag.trim())) {
+                      setPendingTags([...pendingTags, currentTag.trim()]);
+                    }
+                    setCurrentTag("");
+                  }
+                }}
+                placeholder="Add tags..."
+                className="h-8"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  if (!currentTag.trim()) return;
+                  if (!pendingTags.includes(currentTag.trim())) {
+                    setPendingTags([...pendingTags, currentTag.trim()]);
+                  }
+                  setCurrentTag("");
+                }}
+              >
+                <Tag className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {pendingTags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {pendingTags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="gap-1">
+                    {tag}
+                    <button
+                      onClick={() => setPendingTags(pendingTags.filter(t => t !== tag))}
+                      className="ml-1 hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {existingTags.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Existing tags:</p>
+                <div className="flex flex-wrap gap-2">
+                  {existingTags
+                    .filter(tag => !pendingTags.includes(tag))
+                    .map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-muted"
+                        onClick={() => setPendingTags([...pendingTags, tag])}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setIsEditingTags(false);
+                  setPendingTags([]);
+                  setCurrentTag("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => {
+                  if (editingArticle) {
+                    storage.updateArticle(editingArticle.id, { tags: pendingTags })
+                      .then(() => {
+                        queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+                        queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
+                        toast({ title: "Tags updated" });
+                        setIsEditingTags(false);
+                        setPendingTags([]);
+                        setCurrentTag("");
+                      });
+                  }
+                }}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
