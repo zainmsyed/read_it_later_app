@@ -35,12 +35,11 @@ export function SearchCommandPalette({
   }, [open]);
 
   const { data: articles = [] } = useQuery<Article[]>({
-    queryKey: ["/api/articles", search, selectedTags],
-    enabled: open,
-    refetchOnMount: true,
+    queryKey: ["/api/articles"],
+    enabled: true,
     select: (data) => {
-      let filtered = data;
-      if (search.trim()) {
+      let filtered = data || [];
+      if (search?.trim()) {
         const searchLower = search.toLowerCase();
         filtered = filtered.filter(article => 
           article.title?.toLowerCase().includes(searchLower)
