@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote } from "lucide-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -235,69 +235,59 @@ export default function ReadPage() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={isEditingNotes} onOpenChange={(open) => !open && cancelEditingNotes()}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Notes</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            value={pendingNotes}
+            onChange={(e) => setPendingNotes(e.target.value)}
+            placeholder="Write your notes here..."
+            className="min-h-[300px]"
+          />
+          <div className="flex justify-end gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={cancelEditingNotes}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              variant="default"
+              onClick={saveNotes}
+              disabled={updateArticleMutation.isPending}
+            >
+              {updateArticleMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Notes"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
           <h1 className="mb-8">{article.title}</h1>
           <div dangerouslySetInnerHTML={{ __html: article.content }} />
         </article>
 
-        <div className="mt-12 border-t pt-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <StickyNote className="h-5 w-5" />
-              Notes
-            </h2>
-            {!isEditingNotes ? (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={startEditingNotes}
-              >
-                {article.notes ? "Edit Notes" : "Add Notes"}
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={cancelEditingNotes}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={saveNotes}
-                  disabled={updateArticleMutation.isPending}
-                >
-                  {updateArticleMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Notes"
-                  )}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {isEditingNotes ? (
-            <Textarea
-              value={pendingNotes}
-              onChange={(e) => setPendingNotes(e.target.value)}
-              placeholder="Write your notes here..."
-              className="min-h-[200px]"
-            />
-          ) : article.notes ? (
-            <div className="prose prose-sm dark:prose-invert">
-              <pre className="whitespace-pre-wrap font-sans">{article.notes}</pre>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-sm">No notes yet. Click "Add Notes" to get started.</p>
-          )}
-        </div>
+        {/* Floating Notes Button */}
+        <Button
+          className="fixed right-8 top-1/2 transform -translate-y-1/2 shadow-lg"
+          size="lg"
+          onClick={startEditingNotes}
+        >
+          <StickyNote className="h-5 w-5 mr-2" />
+          {article.notes ? "Edit Notes" : "Add Notes"}
+        </Button>
       </main>
     </div>
   );
