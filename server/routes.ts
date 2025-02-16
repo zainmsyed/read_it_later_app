@@ -33,15 +33,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const query = req.query.q as string;
     const tags = req.query.tags ? (req.query.tags as string).split(",") : undefined;
 
-    console.log('Search request:', { query, tags }); // Debug log
+    console.log('Search request:', { query, tags });
 
     try {
       const results = await storage.searchArticles(req.user.id, query, tags);
-      console.log('Search results:', results.length); // Debug log
+      console.log('Search results count:', results.length);
       res.json(results);
     } catch (error) {
       console.error("Error searching articles:", error);
-      res.status(500).json({ message: "Failed to search articles" });
+      res.status(500).json({ 
+        message: "Failed to search articles",
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
   });
 

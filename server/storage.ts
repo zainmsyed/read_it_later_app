@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and, or, SQL, ilike, desc } from "drizzle-orm";
+import { eq, and, or, ilike, desc, sql } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -42,9 +42,12 @@ export class DatabaseStorage implements IStorage {
 
   async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
     try {
-      let conditions: SQL[] = [eq(articles.userId, userId)];
+      console.log('Starting search with:', { userId, query, tags });
 
-      // Fuzzy search using ILIKE for partial matches
+      // Base condition: user's articles only
+      const conditions = [eq(articles.userId, userId)];
+
+      // Add search condition if query exists
       if (query?.trim()) {
         const searchTerm = `%${query.trim().toLowerCase()}%`;
         conditions.push(
@@ -54,13 +57,16 @@ export class DatabaseStorage implements IStorage {
             ilike(articles.description || '', searchTerm)
           )
         );
+        console.log('Added search condition for term:', searchTerm);
       }
 
-      // Tag filtering - articles must have ALL specified tags
-      if (tags?.length) {
+      // Add tag conditions if tags exist
+      if (tags && tags.length > 0) {
+        // Each tag must be in the article's tags array
         tags.forEach(tag => {
-          conditions.push(sql`${articles.tags} @> ARRAY[${tag}]::text[]`);
+          conditions.push(sql`${articles.tags} && ARRAY[${tag}]::text[]`);
         });
+        console.log('Added tag conditions for tags:', tags);
       }
 
       const results = await db
@@ -69,10 +75,11 @@ export class DatabaseStorage implements IStorage {
         .where(and(...conditions))
         .orderBy(desc(articles.created));
 
+      console.log('Search completed. Found results:', results.length);
       return results;
     } catch (error) {
       console.error('Search error:', error);
-      return [];
+      throw error;  // Let the route handler deal with the error
     }
   }
 
