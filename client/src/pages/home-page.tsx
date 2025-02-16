@@ -5,23 +5,21 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, Search } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { SearchCommandPalette } from "@/components/ui/search-command";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTag, setCurrentTag] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -84,18 +82,6 @@ export default function HomePage() {
     },
   });
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setSearchOpen((open) => !open);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -106,7 +92,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex">
-      <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
       <div className="w-64 bg-muted border-r border-border p-4">
         <div className="flex items-center gap-2 mb-8">
           <BookOpenText className="h-6 w-6" />
@@ -232,19 +217,6 @@ export default function HomePage() {
               </Form>
             </DialogContent>
           </Dialog>
-
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            size="sm"
-            onClick={() => setSearchOpen(true)}
-          >
-            <Search className="h-4 w-4 mr-2" />
-            Search
-            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </Button>
 
           <Link href="/">
             <Button variant="ghost" className="w-full justify-start" size="sm">

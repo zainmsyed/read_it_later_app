@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, and, or, ilike, desc, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -21,7 +21,6 @@ export interface IStorage {
   updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences>;
 
   sessionStore: session.Store;
-  searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -40,53 +39,6 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
-    try {
-      console.log('Starting search with:', { userId, query, tags });
-
-      // Base condition: user's articles only and not archived
-      let conditions = [
-        eq(articles.userId, userId),
-        eq(articles.archived, false)
-      ];
-
-      // Add similarity search condition if query exists
-      if (query?.trim()) {
-        const searchTerm = query.trim().toLowerCase();
-        console.log('Processing search term:', searchTerm);
-
-        conditions.push(sql`(
-          text_similarity(LOWER(${articles.title}), ${searchTerm}) > 0.2 OR
-          text_similarity(LOWER(COALESCE(${articles.description}, '')), ${searchTerm}) > 0.2 OR
-          text_similarity(LOWER(${articles.content}), ${searchTerm}) > 0.2
-        )`);
-      }
-
-      // Add tag conditions if tags exist
-      if (tags && tags.length > 0) {
-        tags.forEach(tag => {
-          conditions.push(sql`${articles.tags} @> ARRAY[${tag}]::text[]`);
-        });
-        console.log('Added tag conditions for tags:', tags);
-      }
-
-      // Build the query with ordering
-      const baseQuery = db
-        .select()
-        .from(articles)
-        .where(and(...conditions));
-
-      // Add ordering - by created date
-      const results = await baseQuery.orderBy(desc(articles.created));
-      console.log('Search completed. Found results:', results.length);
-
-      return results;
-    } catch (error) {
-      console.error('Search error:', error);
-      throw error;
-    }
-  }
-
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -103,7 +55,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getArticles(userId: number): Promise<Article[]> {
-    return db.select().from(articles).where(eq(articles.userId, userId));
+    return db
+      .select()
+      .from(articles)
+      .where(eq(articles.userId, userId))
+      .orderBy(desc(articles.created));
   }
 
   async getArticle(id: number): Promise<Article | undefined> {

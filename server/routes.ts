@@ -5,7 +5,6 @@ import { storage } from "./storage";
 import { insertArticleSchema } from "@shared/schema";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
-import { and, ilike, or } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -24,28 +23,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       article.tags?.forEach(tag => tags.add(tag));
     });
     res.json(Array.from(tags).sort());
-  });
-
-  // Search endpoint needs to be before the :id route to avoid being caught by it
-  app.get("/api/articles/search", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-
-    const query = req.query.q as string;
-    const tags = req.query.tags ? (req.query.tags as string).split(",") : undefined;
-
-    console.log('Search request:', { query, tags });
-
-    try {
-      const results = await storage.searchArticles(req.user.id, query, tags);
-      console.log('Search results count:', results.length);
-      res.json(results);
-    } catch (error) {
-      console.error("Error searching articles:", error);
-      res.status(500).json({ 
-        message: "Failed to search articles",
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
-    }
   });
 
   app.get("/api/articles/:id", async (req, res) => {
