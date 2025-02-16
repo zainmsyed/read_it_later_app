@@ -379,7 +379,7 @@ export default function ReadPage() {
             onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
           >
             <BookOpenText className="h-4 w-4 mr-2" />
-            Export MD
+            Export Notes
           </Button>
           <Button variant="ghost" size="sm" onClick={archiveArticle}>
             <Archive className="h-4 w-4 mr-2" />
