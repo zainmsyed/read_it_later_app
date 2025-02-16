@@ -238,7 +238,7 @@ export default function ReadPage() {
     setPendingNotes(article?.notes || "");
   };
 
-  
+
 
   const createHighlight = () => {
     if ((!selectionRange || !selectedText) && !isCreatingHighlight) {
@@ -374,7 +374,7 @@ export default function ReadPage() {
             <BookOpenText className="h-4 w-4 mr-2" />
             Export Notes
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
@@ -741,11 +741,11 @@ export default function ReadPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                      setSelectedText(highlight.text);
-                      setHighlightNote(highlight.note || '');
-                      setHighlightColor(highlight.color || 'yellow');
-                      setIsCreatingHighlight(true);
-                    }}
+                        setSelectedText(highlight.text);
+                        setHighlightNote(highlight.note || '');
+                        setHighlightColor(highlight.color || 'yellow');
+                        setIsCreatingHighlight(true);
+                      }}
                       className="text-muted-foreground"
                     >
                       <StickyNote className="h-4 w-4 mr-2" />
