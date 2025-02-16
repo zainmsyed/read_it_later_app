@@ -25,7 +25,7 @@ export function SearchCommandPalette({
   const [search, setSearch] = React.useState("");
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Reset search when closing
     if (!open) {
       setSearch("");
@@ -74,7 +74,6 @@ export function SearchCommandPalette({
     setSelectedTags([]);
     onOpenChange(false);
   }, [onOpenChange]);
-
 
   return (
     <CommandDialog open={open} onOpenChange={handleClose}>
