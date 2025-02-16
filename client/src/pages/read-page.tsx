@@ -6,7 +6,7 @@ import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, BookOpenText } from "lucide-react";
+import { Loader2, ArrowLeft, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, BookOpenText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -238,15 +238,7 @@ export default function ReadPage() {
     setPendingNotes(article?.notes || "");
   };
 
-  const archiveArticle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    updateArticleMutation.mutate({ archived: true }, {
-      onSuccess: () => {
-        toast({ title: "Article archived" });
-        setLocation("/");
-      }
-    });
-  };
+  
 
   const createHighlight = () => {
     if ((!selectionRange || !selectedText) && !isCreatingHighlight) {
