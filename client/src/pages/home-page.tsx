@@ -446,12 +446,9 @@ export default function HomePage() {
                                 e.stopPropagation();
                                 if (confirm(`Remove tag "${tag}"?`)) {
                                   const updatedTags = article.tags?.filter(t => t !== tag);
-                                  storage.updateArticle(article.id, { tags: updatedTags })
-                                    .then(() => {
-                                      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-                                      queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
-                                      toast({ title: "Tag removed" });
-                                    });
+                                  updateArticleMutation.mutate(
+                                    { id: article.id, data: { tags: updatedTags } }
+                                  );
                                 }
                               }}
                             >
