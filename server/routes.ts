@@ -59,6 +59,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json(parsed.error);
       }
 
+      const url = new URL(req.body.url);
+      
+      // Handle YouTube URLs differently
+      if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
+        const videoId = url.hostname.includes('youtu.be') 
+          ? url.pathname.slice(1)
+          : url.searchParams.get('v');
+
+        if (!videoId) {
+          return res.status(400).json({ message: "Invalid YouTube URL" });
+        }
+
+        const response = await fetch(`https://www.youtube.com/oembed?url=${req.body.url}&format=json`);
+        if (!response.ok) {
+          return res.status(400).json({ message: "Failed to fetch video info" });
+        }
+
+        const videoInfo = await response.json();
+        const content = `
+          <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;max-width:100%;">
+            <iframe 
+              style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" 
+              src="https://www.youtube.com/embed/${videoId}" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          <p>${videoInfo.description || ''}</p>
+        `;
+
+        const saved = await storage.createArticle({
+          userId: req.user.id,
+          url: req.body.url,
+          title: videoInfo.title,
+          content: content,
+          description: videoInfo.description || "",
+          tags: req.body.tags || [],
+          archived: false,
+          logseqSyncStatus: "not_synced"
+        });
+
+        return res.status(201).json(saved);
+      }
+
+      // Handle regular articles
       const response = await fetch(req.body.url);
       if (!response.ok) {
         return res.status(400).json({ message: "Failed to fetch article" });
