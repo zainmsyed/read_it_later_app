@@ -30,14 +30,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) return res.sendStatus(401);
     
     const q = req.query.q as string;
-    const tags = (req.query.tags as string || "").split(",").filter(Boolean);
+    const tagsQuery = req.query.tags as string;
+    const tags = tagsQuery ? tagsQuery.split(",").filter(Boolean) : [];
     
     const articles = await storage.getArticles(req.user.id);
     
     const filtered = articles.filter(article => {
-      const matchesTags = tags.length === 0 || tags.every(tag => article.tags?.includes(tag));
-      const matchesSearch = !q || article.title?.toLowerCase().includes(q.toLowerCase());
-      return matchesSearch && matchesTags;
+      if (tags.length > 0 && (!article.tags || !tags.every(tag => article.tags.includes(tag)))) {
+        return false;
+      }
+      return !q || article.title?.toLowerCase().includes(q.toLowerCase());
     });
     
     res.json(filtered);
