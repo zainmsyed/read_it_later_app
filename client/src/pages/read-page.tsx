@@ -31,6 +31,18 @@ export default function ReadPage() {
   const [noteTab, setNoteTab] = useState<"write" | "preview" | "highlights">("write");
   const [selectionRange, setSelectionRange] = useState<{ start: number, end: number } | null>(null);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const button = document.querySelector('[data-visible]');
+      if (button) {
+        button.setAttribute('data-visible', window.scrollY > 200 ? 'true' : 'false');
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
   });
@@ -759,7 +771,8 @@ export default function ReadPage() {
           
           {(highlights.length > 0 || article.notes) && (
             <Button
-              className="fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg"
+              className="fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg opacity-0 transition-opacity duration-200 ease-in-out hover:opacity-100 data-[visible=true]:opacity-100"
+              data-visible={window.scrollY > 200}
               size="lg"
               variant="secondary"
               onClick={() => {
