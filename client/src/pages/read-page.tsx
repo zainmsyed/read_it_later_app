@@ -746,14 +746,11 @@ export default function ReadPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const newNote = prompt('Edit note:', highlight.note || '');
-                        if (newNote !== null) {
-                          updateHighlightMutation.mutate({ 
-                            id: highlight.id, 
-                            note: newNote 
-                          });
-                        }
-                      }}
+                      setSelectedText(highlight.text);
+                      setHighlightNote(highlight.note || '');
+                      setHighlightColor(highlight.color || 'yellow');
+                      setIsCreatingHighlight(true);
+                    }}
                       className="text-muted-foreground"
                     >
                       <StickyNote className="h-4 w-4 mr-2" />
