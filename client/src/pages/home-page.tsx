@@ -4,7 +4,7 @@ import { Article, insertArticleSchema } from "@shared/schema";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -107,7 +107,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex">
-      <div className="w-64 bg-muted border-r border-border p-4">
+      {/* Fixed Sidebar */}
+      <div className="fixed top-0 left-0 w-64 h-screen bg-muted border-r border-border p-4 overflow-y-auto">
         <div className="flex items-center gap-2 mb-8">
           <BookOpenText className="h-6 w-6" />
           <h1 className="text-xl font-semibold">ReadLater</h1>
@@ -284,7 +285,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="flex-1 p-8">
+      {/* Main Content - Add margin to prevent overlap with sidebar */}
+      <div className="flex-1 ml-64 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="space-y-2">
