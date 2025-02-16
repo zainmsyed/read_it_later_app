@@ -246,7 +246,11 @@ const SidebarHeader = React.forwardRef<
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "flex flex-col gap-2 p-2",
+        "border-b border-sidebar-border",
+        className
+      )}
       {...props}
     />
   )
@@ -624,6 +628,33 @@ const SidebarMenuSubButton = React.forwardRef<
 })
 SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
 
+// Add this component before the exports
+const SidebarCollapseButton = React.forwardRef<
+  React.ElementRef<typeof Button>,
+  React.ComponentProps<typeof Button>
+>(({ className, ...props }, ref) => {
+  const { state, toggleSidebar } = useSidebar()
+  const isCollapsed = state === "collapsed"
+
+  return (
+    <Button
+      ref={ref}
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className={cn("h-8 w-8", className)}
+      {...props}
+    >
+      {isCollapsed ? <PanelRightClose /> : <PanelLeftClose />}
+      <span className="sr-only">
+        {isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+      </span>
+    </Button>
+  )
+})
+SidebarCollapseButton.displayName = "SidebarCollapseButton"
+
+
 export {
   Sidebar,
   SidebarContent,
@@ -648,11 +679,12 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarCollapseButton,
   useSidebar,
 }
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { PanelLeft, PanelRightClose, PanelLeftClose } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Button } from "@/components/ui/button"
