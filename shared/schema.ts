@@ -18,6 +18,7 @@ export const articles = pgTable("articles", {
   tags: text("tags").array(),
   notes: text("notes"),
   archived: boolean("archived").default(false),
+  read: boolean("read").default(false),
   created: timestamp("created").defaultNow(),
   logseqSyncStatus: text("logseq_sync_status").default("not_synced"),
 });

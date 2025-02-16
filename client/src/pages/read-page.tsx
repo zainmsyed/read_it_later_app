@@ -366,14 +366,27 @@ export default function ReadPage() {
           </Button>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
-          >
-            <BookOpenText className="h-4 w-4 mr-2" />
-            Export Notes
-          </Button>
+          <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={article.read}
+                  onChange={(e) => {
+                    updateArticleMutation.mutate({ read: e.target.checked });
+                  }}
+                  className="w-4 h-4 rounded border-gray-300"
+                />
+                <span className="text-sm">Mark as read</span>
+              </label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
+              >
+                <BookOpenText className="h-4 w-4 mr-2" />
+                Export Notes
+              </Button>
+            </div>
 
           <Button
             variant="ghost"
