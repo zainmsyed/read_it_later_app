@@ -1,4 +1,5 @@
 import React from "react";
+import TurndownService from 'turndown';
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Article, Highlight } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
@@ -714,7 +715,15 @@ export default function ReadPage() {
           <h1 className="mb-8">{article.title}</h1>
           <div
             className="article-content"
-            dangerouslySetInnerHTML={{ __html: renderHighlightedContent() }}
+            className="markdown-content"
+>
+  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+    {new TurndownService({
+      headingStyle: 'atx',
+      codeBlockStyle: 'fenced',
+      emDelimiter: '_'
+    }).turndown(renderHighlightedContent())}
+  </ReactMarkdown>
           />
         </article>
 
