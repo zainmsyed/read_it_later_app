@@ -716,8 +716,9 @@ export default function ReadPage() {
                       size="sm"
                       onClick={() => {
                         setHighlightNote(highlight.note || '');
+                        setSelectedText(highlight.text);
                         setIsCreatingHighlight(true);
-                        updateHighlightMutation.mutate({id: highlight.id, note: highlightNote})
+                        setSelectionRange({ start: parseInt(highlight.startOffset), end: parseInt(highlight.endOffset) });
                       }}
                       className="text-muted-foreground"
                     >
