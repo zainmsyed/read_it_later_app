@@ -16,16 +16,23 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 
-// Assume this storage object exists and handles article updates.  Implementation details omitted.
-const storage = {
-  updateArticle: async (id: number, data: Partial<Article>) => {
-    //Implementation to update article data.  This would typically involve a fetch call or similar.
-    const res = await apiRequest("PUT", `/api/articles/${id}`, data)
-    if (!res.ok){
-      throw new Error("Failed to update article")
+const updateArticleMutation = useMutation({
+  mutationFn: async ({ id, data }: { id: number; data: Partial<Article> }) => {
+    const res = await apiRequest("PATCH", `/api/articles/${id}`, data);
+    if (!res.ok) {
+      throw new Error("Failed to update article");
     }
-  }
-}
+    return res.json();
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
+    toast({ title: "Tags updated" });
+  },
+  onError: (error: Error) => {
+    toast({ title: "Failed to update tags", description: error.message, variant: "destructive" });
+  },
+});
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
@@ -591,15 +598,16 @@ export default function HomePage() {
                 variant="default"
                 onClick={() => {
                   if (editingArticle) {
-                    storage.updateArticle(editingArticle.id, { tags: pendingTags })
-                      .then(() => {
-                        queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-                        queryClient.invalidateQueries({ queryKey: ["/api/articles/tags"] });
-                        toast({ title: "Tags updated" });
-                        setIsEditingTags(false);
-                        setPendingTags([]);
-                        setCurrentTag("");
-                      });
+                    updateArticleMutation.mutate(
+                      { id: editingArticle.id, data: { tags: pendingTags } },
+                      {
+                        onSuccess: () => {
+                          setIsEditingTags(false);
+                          setPendingTags([]);
+                          setCurrentTag("");
+                        }
+                      }
+                    );
                   }
                 }}
               >
