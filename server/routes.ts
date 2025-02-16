@@ -26,6 +26,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(Array.from(tags).sort());
   });
 
+  app.get("/api/articles/search", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    
+    const q = req.query.q as string;
+    const tags = (req.query.tags as string || "").split(",").filter(Boolean);
+    
+    const articles = await storage.getArticles(req.user.id);
+    
+    const filtered = articles.filter(article => {
+      const matchesTags = tags.length === 0 || tags.every(tag => article.tags?.includes(tag));
+      const matchesSearch = !q || article.title?.toLowerCase().includes(q.toLowerCase());
+      return matchesSearch && matchesTags;
+    });
+    
+    res.json(filtered);
+  });
+
   app.get("/api/articles/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
 
