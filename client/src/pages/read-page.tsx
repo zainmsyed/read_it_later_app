@@ -176,46 +176,10 @@ export default function ReadPage() {
     const selectedTextContent = selection.toString().trim();
     if (!selectedTextContent) return;
 
-    // Create a temporary element to work with the content
-    const temp = document.createElement('div');
-    temp.innerHTML = article?.content || '';
-    const plainText = temp.textContent || '';
+    //Simplified Position Calculation
+    const startOffset = range.startOffset;
+    const endOffset = range.endOffset;
 
-    // Find the position in the plain text
-    let startOffset = -1;
-    const maxIterations = 100; // Safety limit
-    let iterations = 0;
-    let searchFrom = 0;
-
-    while (startOffset === -1 && iterations < maxIterations) {
-      const found = plainText.indexOf(selectedTextContent, searchFrom);
-      if (found === -1) break;
-
-      // Create a range up to our selection start
-      const beforeRange = document.createRange();
-      beforeRange.setStart(content, 0);
-      beforeRange.setEnd(range.startContainer, range.startOffset);
-      const beforeText = beforeRange.toString();
-
-      if (beforeText.length <= found + 50) { // Add some margin for safety
-        startOffset = found;
-        break;
-      }
-
-      searchFrom = found + 1;
-      iterations++;
-    }
-
-    if (startOffset === -1) {
-      toast({
-        title: "Error",
-        description: "Could not determine the position of the selected text. Please try selecting the text again.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const endOffset = startOffset + selectedTextContent.length;
 
     createHighlightMutation.mutate({
       text: selectedTextContent,
@@ -224,6 +188,29 @@ export default function ReadPage() {
       color: highlightColor,
       note: highlightNote.trim() || undefined
     });
+  };
+
+  const renderHighlightedContent = () => {
+    if (!article?.content || !highlights.length) {
+      return article?.content;
+    }
+
+    let content = article.content;
+    // Sort highlights in reverse order (highest offset first) to avoid position shifting
+    const sortedHighlights = [...highlights].sort((a, b) =>
+      parseInt(b.startOffset) - parseInt(a.startOffset)
+    );
+
+    for (const highlight of sortedHighlights) {
+      const start = parseInt(highlight.startOffset);
+      const end = parseInt(highlight.endOffset);
+
+      content = content.slice(0, start) +
+        `<span class="highlight" style="background-color: ${highlight.color}40; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
+        content.slice(end);
+    }
+
+    return content;
   };
 
   const insertMarkdown = (syntax: string) => {
@@ -268,29 +255,6 @@ export default function ReadPage() {
       textarea.focus();
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
-  };
-
-  const renderHighlightedContent = () => {
-    if (!article?.content || !highlights.length) {
-      return article?.content;
-    }
-
-    let content = article.content;
-    // Sort highlights in reverse order (highest offset first) to avoid position shifting
-    const sortedHighlights = [...highlights].sort((a, b) =>
-      parseInt(b.startOffset) - parseInt(a.startOffset)
-    );
-
-    for (const highlight of sortedHighlights) {
-      const start = parseInt(highlight.startOffset);
-      const end = parseInt(highlight.endOffset);
-
-      content = content.slice(0, start) +
-        `<span class="highlight" style="background-color: ${highlight.color}40; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
-        content.slice(end);
-    }
-
-    return content;
   };
 
 
