@@ -28,7 +28,7 @@ export default function ReadPage() {
   const [highlightNote, setHighlightNote] = useState("");
   const [pendingTags, setPendingTags] = useState<string[]>([]);
   const [pendingNotes, setPendingNotes] = useState("");
-  const [noteTab, setNoteTab] = useState<"write" | "preview">("write");
+  const [noteTab, setNoteTab] = useState<"write" | "preview" | "highlights">("write");
   const [selectionRange, setSelectionRange] = useState<{ start: number, end: number } | null>(null);
 
   const { data: article, isLoading } = useQuery<Article>({
@@ -519,11 +519,12 @@ export default function ReadPage() {
           <DialogHeader>
             <DialogTitle>Notes</DialogTitle>
           </DialogHeader>
-          <Tabs value={noteTab} onValueChange={(value) => setNoteTab(value as "write" | "preview")}>
+          <Tabs value={noteTab} onValueChange={(value) => setNoteTab(value as "write" | "preview" | "highlights")}>
             <div className="flex items-center justify-between mb-4">
               <TabsList>
                 <TabsTrigger value="write">Write</TabsTrigger>
                 <TabsTrigger value="preview">Preview</TabsTrigger>
+                <TabsTrigger value="highlights">Highlights</TabsTrigger>
               </TabsList>
               <div className="flex items-center gap-2">
                 <Button
@@ -583,6 +584,41 @@ export default function ReadPage() {
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {pendingNotes || '*No content to preview*'}
                 </ReactMarkdown>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="highlights" className="mt-0">
+              <div className="space-y-4 max-h-[400px] overflow-y-auto p-4 border rounded-md">
+                {highlights.length > 0 ? highlights.map((highlight) => (
+                  <div
+                    key={highlight.id}
+                    className="p-4 border rounded-lg space-y-2"
+                    style={{
+                      borderColor: highlight.color || 'yellow',
+                      backgroundColor: `${highlight.color || 'yellow'}10`
+                    }}
+                  >
+                    <p className="text-lg">{highlight.text}</p>
+                    {highlight.note && (
+                      <p className="text-sm text-muted-foreground border-t pt-2 mt-2">
+                        {highlight.note}
+                      </p>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteHighlightMutation.mutate(highlight.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </div>
+                )) : (
+                  <p className="text-muted-foreground text-center py-8">
+                    No highlights yet. Select text in the article to create highlights.
+                  </p>
+                )}
               </div>
             </TabsContent>
           </Tabs>
