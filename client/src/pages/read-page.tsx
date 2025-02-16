@@ -3,7 +3,8 @@ import { Article } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, ArrowLeft, Archive, Tag, X, Check } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2, ArrowLeft, Archive, Tag, X, Check, StickyNote } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +17,9 @@ export default function ReadPage() {
   const { toast } = useToast();
   const [currentTag, setCurrentTag] = useState("");
   const [isEditingTags, setIsEditingTags] = useState(false);
+  const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [pendingTags, setPendingTags] = useState<string[]>([]);
+  const [pendingNotes, setPendingNotes] = useState("");
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
@@ -26,27 +29,17 @@ export default function ReadPage() {
     queryKey: ["/api/articles/tags"],
   });
 
-  const updateTagsMutation = useMutation({
-    mutationFn: async (tags: string[]) => {
-      await apiRequest("PATCH", `/api/articles/${params?.id}`, { tags });
+  const updateArticleMutation = useMutation({
+    mutationFn: async (data: Partial<Article>) => {
+      await apiRequest("PATCH", `/api/articles/${params?.id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-      toast({ title: "Tags updated" });
+      toast({ title: "Changes saved" });
       setIsEditingTags(false);
+      setIsEditingNotes(false);
       setPendingTags([]);
-    },
-  });
-
-  const archiveMutation = useMutation({
-    mutationFn: async () => {
-      await apiRequest("PATCH", `/api/articles/${params?.id}`, { archived: true });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-      toast({ title: "Article archived" });
-      setLocation("/");
     },
   });
 
@@ -54,6 +47,11 @@ export default function ReadPage() {
   const startEditing = () => {
     setPendingTags(article?.tags || []);
     setIsEditingTags(true);
+  };
+
+  const startEditingNotes = () => {
+    setPendingNotes(article?.notes || "");
+    setIsEditingNotes(true);
   };
 
   const addTag = () => {
@@ -75,13 +73,31 @@ export default function ReadPage() {
   };
 
   const confirmTagChanges = () => {
-    updateTagsMutation.mutate(pendingTags);
+    updateArticleMutation.mutate({ tags: pendingTags });
+  };
+
+  const saveNotes = () => {
+    updateArticleMutation.mutate({ notes: pendingNotes });
   };
 
   const cancelEditing = () => {
     setIsEditingTags(false);
     setPendingTags([]);
     setCurrentTag("");
+  };
+
+  const cancelEditingNotes = () => {
+    setIsEditingNotes(false);
+    setPendingNotes(article?.notes || "");
+  };
+
+  const archiveArticle = () => {
+    updateArticleMutation.mutate({ archived: true }, {
+      onSuccess: () => {
+        toast({ title: "Article archived" });
+        setLocation("/");
+      }
+    });
   };
 
   if (isLoading) {
@@ -122,7 +138,7 @@ export default function ReadPage() {
             Edit Tags
           </Button>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => archiveMutation.mutate()}>
+        <Button variant="ghost" size="sm" onClick={archiveArticle}>
           <Archive className="h-4 w-4 mr-2" />
           Archive
         </Button>
@@ -161,7 +177,7 @@ export default function ReadPage() {
                     <button
                       onClick={() => removeTag(tag)}
                       className="ml-1 hover:text-destructive"
-                      disabled={updateTagsMutation.isPending}
+                      disabled={updateArticleMutation.isPending}
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -200,9 +216,9 @@ export default function ReadPage() {
                 size="sm"
                 variant="default"
                 onClick={confirmTagChanges}
-                disabled={updateTagsMutation.isPending}
+                disabled={updateArticleMutation.isPending}
               >
-                {updateTagsMutation.isPending ? (
+                {updateArticleMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Saving...
@@ -224,6 +240,64 @@ export default function ReadPage() {
           <h1 className="mb-8">{article.title}</h1>
           <div dangerouslySetInnerHTML={{ __html: article.content }} />
         </article>
+
+        <div className="mt-12 border-t pt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <StickyNote className="h-5 w-5" />
+              Notes
+            </h2>
+            {!isEditingNotes ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={startEditingNotes}
+              >
+                {article.notes ? "Edit Notes" : "Add Notes"}
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={cancelEditingNotes}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={saveNotes}
+                  disabled={updateArticleMutation.isPending}
+                >
+                  {updateArticleMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Notes"
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {isEditingNotes ? (
+            <Textarea
+              value={pendingNotes}
+              onChange={(e) => setPendingNotes(e.target.value)}
+              placeholder="Write your notes here..."
+              className="min-h-[200px]"
+            />
+          ) : article.notes ? (
+            <div className="prose prose-sm dark:prose-invert">
+              <pre className="whitespace-pre-wrap font-sans">{article.notes}</pre>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">No notes yet. Click "Add Notes" to get started.</p>
+          )}
+        </div>
       </main>
     </div>
   );
