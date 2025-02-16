@@ -127,7 +127,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Article not found" });
       }
 
-      await storage.deleteArticle(article.id);
+      // First delete all highlights
+      await db.delete(highlights).where(eq(highlights.articleId, articleId));
+      // Then delete the article
+      await db.delete(articles).where(eq(articles.id, articleId));
+      
       res.sendStatus(204);
     } catch (error) {
       console.error("Error deleting article:", error);
