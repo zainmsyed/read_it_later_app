@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Article, Highlight } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
