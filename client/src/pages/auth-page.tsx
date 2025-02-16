@@ -32,7 +32,7 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="w-[400px]">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">ReadLater</CardTitle>
+            <CardTitle className="text-2xl font-bold">Postea</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login">
@@ -120,7 +120,7 @@ export default function AuthPage() {
       <div className="hidden lg:flex flex-1 bg-muted items-center justify-center p-8">
         <div className="max-w-md text-center">
           <BookOpenText className="mx-auto h-16 w-16 text-primary mb-4" />
-          <h1 className="text-3xl font-bold mb-4">Welcome to ReadLater</h1>
+          <h1 className="text-3xl font-bold mb-4">Welcome to Postea</h1>
           <p className="text-muted-foreground">
             A minimalist read-it-later application focused on distraction-free reading.
             Save articles, customize your reading experience, and enjoy clean, typography-focused content.
