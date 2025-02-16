@@ -13,6 +13,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/articles", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     const articles = await storage.getArticles(req.user.id);
+    
+    if (req.query.includeHighlights === 'true') {
+      const articlesWithHighlights = await Promise.all(
+        articles.map(async (article) => ({
+          ...article,
+          highlights: await storage.getHighlights(article.id)
+        }))
+      );
+      return res.json(articlesWithHighlights);
+    }
+    
     res.json(articles);
   });
 

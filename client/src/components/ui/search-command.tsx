@@ -53,8 +53,12 @@ export function SearchCommandPalette({
   }, [open]);
 
   const { data: articles = [] } = useQuery<ArticleWithHighlights[]>({
-    queryKey: ["/api/articles"],
+    queryKey: ["/api/articles", { includeHighlights: true }],
     enabled: open,
+    queryFn: async () => {
+      const articles = await fetch("/api/articles?includeHighlights=true").then(r => r.json());
+      return articles;
+    },
     select: (data) => {
       let filtered = data || [];
 
