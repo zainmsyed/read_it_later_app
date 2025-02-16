@@ -60,8 +60,8 @@ export default function HomePage() {
   };
 
   const toggleTagFilter = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
@@ -287,12 +287,37 @@ export default function HomePage() {
       <div className="flex-1 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold">Reading List</h2>
-            {selectedTags.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
-                Clear Filters
-              </Button>
-            )}
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Reading List</h2>
+              {selectedTags.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Filtered by:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="default"
+                        className="gap-1"
+                      >
+                        {tag}
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            toggleTagFilter(tag);
+                          }}
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
+                    Clear All
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {isLoading ? (
