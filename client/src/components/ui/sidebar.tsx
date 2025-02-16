@@ -1,49 +1,41 @@
 import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
-
-import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 
-const SIDEBAR_COOKIE_NAME = "sidebar:state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
-const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
-type SidebarContext = {
-  state: "expanded" | "collapsed"
-  open: boolean
-  setOpen: (open: boolean) => void
-  openMobile: boolean
-  setOpenMobile: (open: boolean) => void
-  isMobile: boolean
-  toggleSidebar: () => void
-}
+const Sidebar = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, children, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "fixed top-0 left-0 h-screen w-64 border-r bg-background overflow-y-auto",
+        className
+      )}
+      style={{ width: SIDEBAR_WIDTH }}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+})
+Sidebar.displayName = "Sidebar"
 
-const SidebarContext = React.createContext<SidebarContext | null>(null)
-
-function useSidebar() {
-  const context = React.useContext(SidebarContext)
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.")
-  }
-
-  return context
-}
+const SidebarContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div">
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex-1 overflow-y-auto", className)}
+      {...props}
+    />
+  )
+})
+SidebarContent.displayName = "SidebarContent"
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
@@ -154,91 +146,6 @@ const SidebarProvider = React.forwardRef<
   }
 )
 SidebarProvider.displayName = "SidebarProvider"
-
-const Sidebar = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    side?: "left" | "right"
-    variant?: "sidebar" | "floating" | "inset"
-    collapsible?: "offcanvas" | "icon" | "none"
-  }
->(
-  (
-    {
-      side = "left",
-      variant = "sidebar",
-      collapsible = "offcanvas",
-      className,
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
-
-    if (collapsible === "none") {
-      return (
-        <div
-          className={cn(
-            "fixed top-0 left-0 h-screen w-[--sidebar-width] flex flex-col bg-sidebar text-sidebar-foreground",
-            className
-          )}
-          ref={ref}
-          {...props}
-        >
-          {children}
-        </div>
-      )
-    }
-
-    if (isMobile) {
-      return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
-          <SheetContent
-            data-sidebar="sidebar"
-            data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden overflow-y-auto"
-            style={
-              {
-                "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-              } as React.CSSProperties
-            }
-            side={side}
-          >
-            <div className="flex h-full w-full flex-col">{children}</div>
-          </SheetContent>
-        </Sheet>
-      )
-    }
-
-    return (
-      <div
-        ref={ref}
-        className="fixed top-0 left-0 h-screen group peer"
-        data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
-        data-variant={variant}
-        data-side={side}
-      >
-        <div
-          className={cn(
-            "flex h-full w-[--sidebar-width] flex-col bg-sidebar",
-            className
-          )}
-          {...props}
-        >
-          <div
-            data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar overflow-y-auto"
-          >
-            {children}
-          </div>
-        </div>
-      </div>
-    )
-  }
-)
-Sidebar.displayName = "Sidebar"
 
 const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
@@ -742,4 +649,47 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
+}
+import { Slot } from "@radix-ui/react-slot"
+import { VariantProps, cva } from "class-variance-authority"
+import { PanelLeft } from "lucide-react"
+
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
+const SIDEBAR_COOKIE_NAME = "sidebar:state"
+const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_KEYBOARD_SHORTCUT = "b"
+
+type SidebarContext = {
+  state: "expanded" | "collapsed"
+  open: boolean
+  setOpen: (open: boolean) => void
+  openMobile: boolean
+  setOpenMobile: (open: boolean) => void
+  isMobile: boolean
+  toggleSidebar: () => void
+}
+
+const SidebarContext = React.createContext<SidebarContext | null>(null)
+
+function useSidebar() {
+  const context = React.useContext(SidebarContext)
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider.")
+  }
+
+  return context
 }
