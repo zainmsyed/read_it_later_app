@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, ilike, and, or, SQL } from "drizzle-orm";
+import { eq, ilike, and, or, SQL, inArray } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -38,6 +38,42 @@ export class DatabaseStorage implements IStorage {
       },
       createTableIfMissing: true,
     });
+  }
+
+  async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
+    const conditions: SQL[] = [eq(articles.userId, userId)];
+
+    // Text search
+    if (query?.trim()) {
+      const searchTerms = query.trim().toLowerCase().split(/\s+/);
+      const searchConditions = searchTerms.map(term => 
+        or(
+          ilike(articles.title, `%${term}%`),
+          ilike(articles.content, `%${term}%`),
+          ilike(articles.description || '', `%${term}%`)
+        )
+      );
+      conditions.push(and(...searchConditions));
+    }
+
+    // Tag filtering - if tags are provided, only show articles that have ALL the specified tags
+    if (tags?.length) {
+      // For each tag, check if it's in the article's tags array
+      tags.forEach(tag => {
+        conditions.push(inArray(tag, articles.tags));
+      });
+    }
+
+    try {
+      return await db
+        .select()
+        .from(articles)
+        .where(and(...conditions))
+        .orderBy(articles.created);
+    } catch (error) {
+      console.error('Search error:', error);
+      return [];
+    }
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -113,30 +149,6 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!updated) throw new Error("Preferences not found");
     return updated;
-  }
-
-  async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
-    const conditions: SQL[] = [eq(articles.userId, userId)];
-
-    if (query?.trim()) {
-      const searchTerms = query.trim().toLowerCase().split(/\s+/);
-      const searchConditions = searchTerms.flatMap(term => [
-        ilike(articles.title, `%${term}%`),
-        ilike(articles.content, `%${term}%`),
-        ilike(articles.description, `%${term}%`)
-      ]);
-      conditions.push(or(...searchConditions));
-    }
-
-    if (tags?.length) {
-      conditions.push(or(...tags.map(tag => ilike(articles.tags.toString(), `%${tag}%`))));
-    }
-
-    return db
-      .select()
-      .from(articles)
-      .where(and(...conditions))
-      .orderBy(articles.created);
   }
 }
 
