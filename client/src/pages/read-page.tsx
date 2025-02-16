@@ -747,9 +747,9 @@ export default function ReadPage() {
         )}
 
         {/* Floating Buttons */}
-        <div className="fixed right-8 flex flex-col gap-4 top-1/2 transform -translate-y-1/2">
+        <div className="fixed right-8 flex flex-col gap-4">
           <Button
-            className="shadow-lg"
+            className="fixed right-8 top-1/2 transform -translate-y-1/2 shadow-lg"
             size="lg"
             onClick={startEditingNotes}
           >
@@ -759,7 +759,7 @@ export default function ReadPage() {
           
           {(highlights.length > 0 || article.notes) && (
             <Button
-              className="shadow-lg"
+              className="fixed right-8 bottom-8 shadow-lg"
               size="lg"
               variant="secondary"
               onClick={() => {
@@ -767,7 +767,7 @@ export default function ReadPage() {
                 highlightsSection?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <ArrowLeft className="h-5 w-5 rotate-90 mr-2" />
+              <ArrowLeft className="h-5 w-5 rotate-180 mr-2" />
               Jump to Annotations
             </Button>
           )}
