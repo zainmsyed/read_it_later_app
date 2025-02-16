@@ -180,7 +180,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "fixed top-0 left-0 flex h-screen w-[--sidebar-width] flex-col bg-sidebar text-sidebar-foreground",
+            "fixed top-0 left-0 h-screen w-[--sidebar-width] flex flex-col bg-sidebar text-sidebar-foreground",
             className
           )}
           ref={ref}
@@ -214,7 +214,7 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer fixed top-0 left-0 h-screen"
+        className="fixed top-0 left-0 h-screen group peer"
         data-state={state}
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
@@ -222,7 +222,7 @@ const Sidebar = React.forwardRef<
       >
         <div
           className={cn(
-            "duration-200 fixed inset-y-0 z-10 flex h-screen w-[--sidebar-width] transition-[left,right,width] ease-linear",
+            "fixed inset-y-0 z-10 flex h-screen w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -391,7 +391,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex flex-1 flex-col gap-2 overflow-y-auto h-[calc(100vh-4rem)]",
+        "flex-1 overflow-y-auto",
         "group-data-[collapsible=icon]:overflow-hidden",
         className
       )}
