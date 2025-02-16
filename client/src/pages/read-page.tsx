@@ -746,15 +746,32 @@ export default function ReadPage() {
           </div>
         )}
 
-        {/* Floating Notes Button */}
-        <Button
-          className="fixed right-8 top-1/2 transform -translate-y-1/2 shadow-lg"
-          size="lg"
-          onClick={startEditingNotes}
-        >
-          <StickyNote className="h-5 w-5 mr-2" />
-          {article.notes ? "Edit Notes" : "Add Notes"}
-        </Button>
+        {/* Floating Buttons */}
+        <div className="fixed right-8 flex flex-col gap-4 top-1/2 transform -translate-y-1/2">
+          <Button
+            className="shadow-lg"
+            size="lg"
+            onClick={startEditingNotes}
+          >
+            <StickyNote className="h-5 w-5 mr-2" />
+            {article.notes ? "Edit Notes" : "Add Notes"}
+          </Button>
+          
+          {(highlights.length > 0 || article.notes) && (
+            <Button
+              className="shadow-lg"
+              size="lg"
+              variant="secondary"
+              onClick={() => {
+                const highlightsSection = document.querySelector('h2:has(.h-5.w-5)');
+                highlightsSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <ArrowLeft className="h-5 w-5 rotate-90 mr-2" />
+              Jump to Annotations
+            </Button>
+          )}
+        </div>
 
         {/* Display formatted notes in the article view */}
         {article.notes && (
