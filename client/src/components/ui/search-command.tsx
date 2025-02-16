@@ -41,12 +41,13 @@ export function SearchCommandPalette({
       if (search.trim()) params.append("q", search.trim());
       if (selectedTags.length > 0) params.append("tags", selectedTags.join(","));
       const response = await fetch(`/api/articles/search?${params.toString()}`, {
-        credentials: 'include' // Add credentials for authentication
+        credentials: 'include'
       });
       if (!response.ok) throw new Error("Failed to search articles");
       return response.json();
     },
-    enabled: open,
+    enabled: open && (search.trim().length > 0 || selectedTags.length > 0),
+    refetchOnWindowFocus: false,
   });
 
   const { data: allTags = [] } = useQuery<string[]>({
