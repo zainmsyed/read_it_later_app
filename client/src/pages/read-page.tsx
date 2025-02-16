@@ -94,6 +94,17 @@ export default function ReadPage() {
     },
   });
 
+  const updateHighlightMutation = useMutation({
+    mutationFn: async (data: { id: number; note: string }) => {
+      await apiRequest("PATCH", `/api/highlights/${data.id}`, { note: data.note });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}/highlights`] });
+      toast({ title: "Highlight note updated" });
+      setIsCreatingHighlight(false);
+    },
+  });
+
 
   useEffect(() => {
     const handleSelection = () => {
@@ -604,15 +615,33 @@ export default function ReadPage() {
                         {highlight.note}
                       </p>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteHighlightMutation.mutate(highlight.id)}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setHighlightNote(highlight.note || '');
+                          setIsCreatingHighlight(true);
+                          updateHighlightMutation.mutate({
+                            id: highlight.id,
+                            note: highlightNote
+                          });
+                        }}
+                        className="text-muted-foreground"
+                      >
+                        <StickyNote className="h-4 w-4 mr-2" />
+                        Edit Note
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteHighlightMutation.mutate(highlight.id)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </div>
                   </div>
                 )) : (
                   <p className="text-muted-foreground text-center py-8">
@@ -685,15 +714,33 @@ export default function ReadPage() {
                       {highlight.note}
                     </p>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => deleteHighlightMutation.mutate(highlight.id)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setHighlightNote(highlight.note || '');
+                        setIsCreatingHighlight(true);
+                        updateHighlightMutation.mutate({
+                          id: highlight.id,
+                          note: highlightNote
+                        });
+                      }}
+                      className="text-muted-foreground"
+                    >
+                      <StickyNote className="h-4 w-4 mr-2" />
+                      Edit Note
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteHighlightMutation.mutate(highlight.id)}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
