@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/command";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SearchIcon, Tag } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
 export function SearchCommandPalette({
   open,
@@ -24,99 +24,54 @@ export function SearchCommandPalette({
 }) {
   const [, setLocation] = useLocation();
   const [search, setSearch] = React.useState("");
-  const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
-
-  React.useEffect(() => {
-    // Reset search when closing
-    if (!open) {
-      setSearch("");
-      setSelectedTags([]);
-    }
-  }, [open]);
 
   const { data: articles = [] } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
-    enabled: true,
-    select: (data) => {
-      let filtered = data || [];
-      if (search?.trim()) {
-        const searchLower = search.toLowerCase();
-        filtered = filtered.filter(article => 
-          article.title?.toLowerCase().includes(searchLower)
-        );
-      }
-      if (selectedTags.length > 0) {
-        filtered = filtered.filter(article => 
-          selectedTags.every(tag => article.tags?.includes(tag))
-        );
-      }
-      return filtered;
-    }
-  });
-
-  const { data: allTags = [] } = useQuery<string[]>({
-    queryKey: ["/api/articles/tags"],
     enabled: open,
+    select: (data) => {
+      if (!search?.trim()) return data || [];
+      const searchLower = search.toLowerCase();
+      return (data || []).filter(article => 
+        article.title?.toLowerCase().includes(searchLower) ||
+        article.description?.toLowerCase().includes(searchLower)
+      );
+    }
   });
 
-  const handleSelect = React.useCallback((value: string) => {
-    if (value.startsWith("tag:")) {
-      const tag = value.replace("tag:", "");
-      setSelectedTags((prev) =>
-        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-      );
-      return;
-    }
-
-    if (value.startsWith("article:")) {
-      const id = value.replace("article:", "");
-      setLocation(`/read/${id}`);
-      handleClose();
-    }
-  }, [setLocation]);
-
-  const handleSearch = React.useCallback(() => {
-    if (articles.length > 0 && articles[0].id) {
-      setLocation(`/read/${articles[0].id}`);
-      handleClose();
-    }
-  }, [articles, setLocation]);
-
-  const handleClose = React.useCallback(() => {
-    setSearch("");
-    setSelectedTags([]);
+  const handleSelect = React.useCallback((articleId: string) => {
+    setLocation(`/read/${articleId}`);
     onOpenChange(false);
-  }, [onOpenChange]);
+  }, [setLocation, onOpenChange]);
 
   return (
-    <CommandDialog open={open} onOpenChange={handleClose}>
+    <CommandDialog open={open} onOpenChange={onOpenChange}>
       <Command className="rounded-lg border shadow-md">
         <CommandInput
-          placeholder={selectedTags.length > 0 ? "Search in filtered articles..." : "Search articles..."}
+          placeholder="Search articles..."
           value={search}
           onValueChange={setSearch}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && articles.length > 0) {
-              handleSearch();
-            }
-          }}
         />
         <CommandList>
           <CommandEmpty>No articles found.</CommandEmpty>
-          {(articles && articles.length > 0) && (
+          {articles.length > 0 && (
             <CommandGroup heading="Articles">
               {articles.map((article) => (
                 <CommandItem
                   key={article.id}
-                  value={`article:${article.id}`}
-                  onSelect={handleSelect}
+                  value={article.title}
+                  onSelect={() => handleSelect(article.id.toString())}
                   className="cursor-pointer"
                 >
                   <SearchIcon className="mr-2 h-4 w-4" />
-                  <div className="flex flex-col">
-                    <span>{article.title}</span>
+                  <div className="flex flex-col gap-1 flex-1">
+                    <span className="font-medium">{article.title}</span>
+                    {article.description && (
+                      <span className="text-sm text-muted-foreground line-clamp-1">
+                        {article.description}
+                      </span>
+                    )}
                     {article.tags && article.tags.length > 0 && (
-                      <div className="flex gap-1 mt-1">
+                      <div className="flex flex-wrap gap-1">
                         {article.tags.map((tag) => (
                           <Badge key={tag} variant="secondary" className="text-xs">
                             {tag}
@@ -129,36 +84,7 @@ export function SearchCommandPalette({
               ))}
             </CommandGroup>
           )}
-          {allTags.length > 0 && (
-            <CommandGroup heading="Filter by tag">
-              {allTags.map((tag) => (
-                <CommandItem
-                  key={tag}
-                  value={`tag:${tag}`}
-                  onSelect={handleSelect}
-                  className="cursor-pointer"
-                >
-                  <Tag className="mr-2 h-4 w-4" />
-                  <span>{tag}</span>
-                  {selectedTags.includes(tag) && (
-                    <Badge variant="secondary" className="ml-auto">
-                      Selected
-                    </Badge>
-                  )}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          )}
         </CommandList>
-        <div className="p-4 border-t flex justify-end gap-2">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleSearch}
-          >
-            Search
-          </Button>
-        </div>
       </Command>
     </CommandDialog>
   );
