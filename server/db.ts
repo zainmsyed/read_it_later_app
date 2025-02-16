@@ -1,3 +1,4 @@
+
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
@@ -11,5 +12,19 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Use connection pooling URL
+const poolUrl = process.env.DATABASE_URL.replace('.us-east-2', '-pooler.us-east-2');
+
+export const pool = new Pool({ 
+  connectionString: poolUrl,
+  max: 10,
+  connectionTimeoutMillis: 3000,
+  retryAttempts: 3
+});
+
+// Add error handler for the pool
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle database client', err);
+});
+
 export const db = drizzle({ client: pool, schema });
