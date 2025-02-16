@@ -98,7 +98,7 @@ export function SearchCommandPalette({
         />
         <CommandList>
           <CommandEmpty>No articles found.</CommandEmpty>
-          {articles.length > 0 && (
+          {(articles?.length > 0 || search.trim()) && (
             <CommandGroup heading="Articles">
               {articles.map((article) => (
                 <CommandItem
@@ -145,17 +145,15 @@ export function SearchCommandPalette({
             </CommandGroup>
           )}
         </CommandList>
-        {selectedTags.length > 0 && (
-          <div className="p-4 border-t flex justify-end gap-2">
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleSearch}
-            >
-              Search
-            </Button>
-          </div>
-        )}
+        <div className="p-4 border-t flex justify-end gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleSearch}
+          >
+            Search
+          </Button>
+        </div>
       </Command>
     </CommandDialog>
   );
