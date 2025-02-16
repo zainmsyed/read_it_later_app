@@ -14,10 +14,12 @@
 
 @layer components {
   .tag-badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium transition-colors;
+    @apply inline-flex items-center justify-center rounded-full text-xs font-medium transition-colors;
     @apply bg-secondary/50 hover:bg-secondary/70 text-secondary-foreground;
     @apply border border-secondary/20;
-    height: 1.5rem;
+    @apply px-2.5 py-0.5;
+    min-height: 1.5rem;
+    min-width: fit-content;
   }
 }
 
