@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose, RefreshCw, Trash2 } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose, RefreshCw, Trash2, SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
