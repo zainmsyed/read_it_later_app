@@ -29,6 +29,7 @@ export default function ReadPage() {
   const [pendingTags, setPendingTags] = useState<string[]>([]);
   const [pendingNotes, setPendingNotes] = useState("");
   const [noteTab, setNoteTab] = useState<"write" | "preview">("write");
+  const [selectionRange, setSelectionRange] = useState<{ start: number, end: number } | null>(null);
 
   const { data: article, isLoading } = useQuery<Article>({
     queryKey: [`/api/articles/${params?.id}`],
@@ -94,10 +95,41 @@ export default function ReadPage() {
 
       const text = selection.toString().trim();
       if (text) {
-        setSelectedText(text);
-        setHighlightColor("yellow"); // Reset color to default
-        setHighlightNote(""); // Reset note
-        setIsCreatingHighlight(true);
+        // Calculate text position
+        const articleContent = document.querySelector('.article-content');
+        if (!articleContent) return;
+
+        // Get all text nodes in the article content
+        const walker = document.createTreeWalker(
+          articleContent,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+
+        let currentPos = 0;
+        let startOffset = -1;
+        let endOffset = -1;
+
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+
+          if (node === range.startContainer) {
+            startOffset = currentPos + range.startOffset;
+          }
+          if (node === range.endContainer) {
+            endOffset = currentPos + range.endOffset;
+            break;
+          }
+          currentPos += node.textContent?.length || 0;
+        }
+
+        if (startOffset !== -1 && endOffset !== -1) {
+          setSelectionRange({ start: startOffset, end: endOffset });
+          setSelectedText(text);
+          setHighlightColor("yellow"); // Reset color to default
+          setHighlightNote(""); // Reset note
+          setIsCreatingHighlight(true);
+        }
       }
     };
 
@@ -162,29 +194,19 @@ export default function ReadPage() {
   };
 
   const createHighlight = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) return;
-
-    const range = selection.getRangeAt(0);
-    const content = document.querySelector('.article-content');
-    if (!content) {
-      console.error('Article content element not found');
+    if (!selectionRange || !selectedText) {
+      toast({
+        title: "Error",
+        description: "Please select some text first",
+        variant: "destructive"
+      });
       return;
     }
 
-    // Get the selected text
-    const selectedTextContent = selection.toString().trim();
-    if (!selectedTextContent) return;
-
-    //Simplified Position Calculation
-    const startOffset = range.startOffset;
-    const endOffset = range.endOffset;
-
-
     createHighlightMutation.mutate({
-      text: selectedTextContent,
-      startOffset: startOffset.toString(),
-      endOffset: endOffset.toString(),
+      text: selectedText,
+      startOffset: selectionRange.start.toString(),
+      endOffset: selectionRange.end.toString(),
       color: highlightColor,
       note: highlightNote.trim() || undefined
     });
