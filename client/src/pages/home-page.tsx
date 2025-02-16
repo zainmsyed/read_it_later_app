@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,10 @@ export default function HomePage() {
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
     select: (data) => data.filter(article => !article.archived)
+  });
+
+  const { data: archivedArticles, isLoading: isArchivedLoading } = useQuery<Article[]>({
+    queryKey: ["/api/articles/archived"], // Assumed API endpoint for archived articles
   });
 
   const { data: existingTags = [] } = useQuery<string[]>({
@@ -80,6 +84,7 @@ export default function HomePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/articles/archived"] }); //Invalidate archived articles
       toast({ title: "Article saved successfully" });
       form.reset();
       setDialogOpen(false);
@@ -98,7 +103,7 @@ export default function HomePage() {
     return selectedTags.every(tag => article.tags?.includes(tag));
   });
 
-  if (isLoading) {
+  if (isLoading || isArchivedLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-border" />
@@ -330,39 +335,48 @@ export default function HomePage() {
         }`}
       >
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-semibold">Reading List</h2>
-              {selectedTags.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Filtered by:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="default"
-                        className="gap-1"
-                      >
-                        {tag}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleTagFilter(tag);
-                          }}
-                          className="ml-1 hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
-                    Clear All
-                  </Button>
-                </div>
-              )}
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : 'Reading List'}</h2>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+                }}
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
           </div>
+          {selectedTags.length > 0 && (
+            <div className="flex-1 flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Filtered by:</span>
+              <div className="flex flex-wrap gap-2">
+                {selectedTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="default"
+                    className="gap-1"
+                  >
+                    {tag}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleTagFilter(tag);
+                      }}
+                      className="ml-1 hover:text-destructive"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
+                Clear All
+              </Button>
+            </div>
+          )}
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
