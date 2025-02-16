@@ -14,6 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
 
 // Assume this storage object exists and handles article updates.  Implementation details omitted.
 const storage = {
@@ -33,9 +34,7 @@ export default function HomePage() {
   const [pendingTags, setPendingTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState("");
   const { toast } = useToast();
-  const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentTag, setCurrentTag] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
