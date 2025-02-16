@@ -89,6 +89,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteArticle(id: number): Promise<void> {
+    // First delete all highlights associated with this article
+    await db.delete(highlights).where(eq(highlights.articleId, id));
+    // Then delete the article
     await db.delete(articles).where(eq(articles.id, id));
   }
 
