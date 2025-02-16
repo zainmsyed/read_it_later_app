@@ -56,46 +56,31 @@ export class DatabaseStorage implements IStorage {
         console.log('Processing search term:', searchTerm);
 
         conditions.push(sql`(
-          similarity(LOWER(${articles.title}), ${searchTerm}) > 0.3 OR
-          similarity(LOWER(COALESCE(${articles.description}, '')), ${searchTerm}) > 0.3 OR
-          similarity(LOWER(${articles.content}), ${searchTerm}) > 0.3
+          text_similarity(LOWER(${articles.title}), ${searchTerm}) > 0.2 OR
+          text_similarity(LOWER(COALESCE(${articles.description}, '')), ${searchTerm}) > 0.2 OR
+          text_similarity(LOWER(${articles.content}), ${searchTerm}) > 0.2
         )`);
       }
 
       // Add tag conditions if tags exist
       if (tags && tags.length > 0) {
-        // For each tag, ensure it exists in the article's tags array
         tags.forEach(tag => {
           conditions.push(sql`${articles.tags} @> ARRAY[${tag}]::text[]`);
         });
         console.log('Added tag conditions for tags:', tags);
       }
 
-      // Build the query with ordering by similarity when search term exists
+      // Build the query with ordering
       const baseQuery = db
-        .select({
-          ...articles,
-          ...(query?.trim() ? {
-            similarity: sql`GREATEST(
-              similarity(LOWER(${articles.title}), ${query.trim().toLowerCase()}),
-              similarity(LOWER(COALESCE(${articles.description}, '')), ${query.trim().toLowerCase()}),
-              similarity(LOWER(${articles.content}), ${query.trim().toLowerCase()})
-            )`
-          } : {})
-        })
+        .select()
         .from(articles)
         .where(and(...conditions));
 
-      // Add ordering - by similarity if searching, otherwise by created date
-      const finalQuery = query?.trim()
-        ? baseQuery.orderBy(desc(sql`similarity`), desc(articles.created))
-        : baseQuery.orderBy(desc(articles.created));
-
-      const results = await finalQuery;
+      // Add ordering - by created date
+      const results = await baseQuery.orderBy(desc(articles.created));
       console.log('Search completed. Found results:', results.length);
 
-      // Remove the similarity score from the results before returning
-      return results.map(({ similarity, ...article }) => article as Article);
+      return results;
     } catch (error) {
       console.error('Search error:', error);
       throw error;
