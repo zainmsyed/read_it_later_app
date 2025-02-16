@@ -30,17 +30,33 @@ export default function ReadPage() {
   const [pendingNotes, setPendingNotes] = useState("");
   const [noteTab, setNoteTab] = useState<"write" | "preview" | "highlights">("write");
   const [selectionRange, setSelectionRange] = useState<{ start: number, end: number } | null>(null);
+  const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const buttonTimeoutRef = React.useRef<NodeJS.Timeout>();
 
   useEffect(() => {
+    const showButton = () => {
+      setIsButtonVisible(true);
+      if (buttonTimeoutRef.current) {
+        clearTimeout(buttonTimeoutRef.current);
+      }
+      buttonTimeoutRef.current = setTimeout(() => {
+        setIsButtonVisible(false);
+      }, 3000);
+    };
+
     const handleScroll = () => {
-      const button = document.querySelector('[data-visible]');
-      if (button) {
-        button.setAttribute('data-visible', window.scrollY > 200 ? 'true' : 'false');
+      if (window.scrollY > 200) {
+        showButton();
       }
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (buttonTimeoutRef.current) {
+        clearTimeout(buttonTimeoutRef.current);
+      }
+    };
   }, []);
 
   const { data: article, isLoading } = useQuery<Article>({
@@ -771,8 +787,13 @@ export default function ReadPage() {
           
           {(highlights.length > 0 || article.notes) && (
             <Button
-              className="fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg opacity-0 transition-opacity duration-200 ease-in-out hover:opacity-100 data-[visible=true]:opacity-100"
-              data-visible={window.scrollY > 200}
+              className={`fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg transition-opacity duration-200 ease-in-out ${isButtonVisible ? 'opacity-100' : 'opacity-0'} hover:opacity-100`}
+              onMouseEnter={() => setIsButtonVisible(true)}
+              onMouseLeave={() => {
+                buttonTimeoutRef.current = setTimeout(() => {
+                  setIsButtonVisible(false);
+                }, 3000);
+              }}
               size="lg"
               variant="secondary"
               onClick={() => {
