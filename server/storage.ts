@@ -45,19 +45,19 @@ export class DatabaseStorage implements IStorage {
       console.log('Starting search with:', { userId, query, tags });
 
       // Base condition: user's articles only
-      const conditions = [eq(articles.userId, userId)];
+      let conditions = [eq(articles.userId, userId)];
 
-      // Add search condition if query exists
+      // Add similarity search condition if query exists
       if (query?.trim()) {
-        const searchTerm = `%${query.trim().toLowerCase()}%`;
-        conditions.push(
-          or(
-            ilike(articles.title, searchTerm),
-            ilike(articles.content, searchTerm),
-            ilike(articles.description || '', searchTerm)
-          )
-        );
-        console.log('Added search condition for term:', searchTerm);
+        const searchTerm = query.trim().toLowerCase();
+        console.log('Processing search term:', searchTerm);
+
+        // Use similarity with a threshold for fuzzy matching
+        conditions.push(sql`(
+          similarity(LOWER(title), ${searchTerm}) > 0.3 OR
+          similarity(LOWER(description), ${searchTerm}) > 0.3 OR
+          similarity(LOWER(content), ${searchTerm}) > 0.3
+        )`);
       }
 
       // Add tag conditions if tags exist
@@ -69,17 +69,36 @@ export class DatabaseStorage implements IStorage {
         console.log('Added tag conditions for tags:', tags);
       }
 
-      const results = await db
-        .select()
+      // Build the query with ordering by similarity when search term exists
+      let query = db
+        .select({
+          ...articles,
+          ...(query?.trim() ? {
+            similarity: sql`GREATEST(
+              similarity(LOWER(title), ${query.trim().toLowerCase()}),
+              similarity(LOWER(description), ${query.trim().toLowerCase()}),
+              similarity(LOWER(content), ${query.trim().toLowerCase()})
+            )`
+          } : {})
+        })
         .from(articles)
-        .where(and(...conditions))
-        .orderBy(desc(articles.created));
+        .where(and(...conditions));
 
+      // Add ordering - by similarity if searching, otherwise by created date
+      if (query?.trim()) {
+        query = query.orderBy(desc(sql`similarity`), desc(articles.created));
+      } else {
+        query = query.orderBy(desc(articles.created));
+      }
+
+      const results = await query;
       console.log('Search completed. Found results:', results.length);
-      return results;
+
+      // Remove the similarity score from the results before returning
+      return results.map(({ similarity, ...article }) => article as Article);
     } catch (error) {
       console.error('Search error:', error);
-      throw error;  // Let the route handler deal with the error
+      throw error;
     }
   }
 
