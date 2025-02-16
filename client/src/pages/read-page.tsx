@@ -715,11 +715,10 @@ export default function ReadPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setHighlightNote(highlight.note || '');
-                        setSelectedText(highlight.text);
-                        setIsCreatingHighlight(true);
-                        setSelectionRange({ start: parseInt(highlight.startOffset), end: parseInt(highlight.endOffset) });
-                        setHighlightColor(highlight.color || 'yellow');
+                        updateHighlightMutation.mutate({ 
+                          id: highlight.id, 
+                          note: prompt('Edit note:', highlight.note || '') || '' 
+                        });
                       }}
                       className="text-muted-foreground"
                     >
