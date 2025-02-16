@@ -270,6 +270,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let markdown = `# ${article.title}\n\n`;
       markdown += `[Original Article](${article.url})\n\n`;
+      
+      if (article.tags && article.tags.length > 0) {
+        markdown += `Tags: ${article.tags.join(", ")}\n\n`;
+      }
 
       if (highlights.length > 0) {
         markdown += `## Highlights\n\n`;
