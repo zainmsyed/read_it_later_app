@@ -555,9 +555,9 @@ export default function ReadPage() {
 
       {/* Notes Dialog */}
       <Dialog open={isEditingNotes} onOpenChange={(open) => !open && cancelEditingNotes()}>
-        <DialogContent className="sm:max-w-[800px]">
+        <DialogContent className="sm:max-w-[800px] bg-background/80 backdrop-blur-md border-zinc-800 p-6">
           <DialogHeader>
-            <DialogTitle>Notes</DialogTitle>
+            <DialogTitle className="text-lg font-medium">Edit Note</DialogTitle>
           </DialogHeader>
           <Tabs value={noteTab} onValueChange={(value) => setNoteTab(value as "write" | "preview" | "highlights")}>
             <div className="flex items-center justify-between mb-4">
