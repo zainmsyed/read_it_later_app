@@ -2,7 +2,7 @@ import { users, articles, preferences, type User, type InsertUser, type Article,
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
-import { eq, ilike, and, or, SQL, inArray } from "drizzle-orm";
+import { eq, ilike, and, or, SQL, sql, desc } from "drizzle-orm";
 
 const PostgresStore = connectPg(session);
 
@@ -41,35 +41,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchArticles(userId: number, query?: string, tags?: string[]): Promise<Article[]> {
-    const conditions: SQL[] = [eq(articles.userId, userId)];
-
-    // Text search
-    if (query?.trim()) {
-      const searchTerms = query.trim().toLowerCase().split(/\s+/);
-      const searchConditions = searchTerms.map(term => 
-        or(
-          ilike(articles.title, `%${term}%`),
-          ilike(articles.content, `%${term}%`),
-          ilike(articles.description || '', `%${term}%`)
-        )
-      );
-      conditions.push(and(...searchConditions));
-    }
-
-    // Tag filtering - if tags are provided, only show articles that have ALL the specified tags
-    if (tags?.length) {
-      // For each tag, check if it's in the article's tags array
-      tags.forEach(tag => {
-        conditions.push(inArray(tag, articles.tags));
-      });
-    }
-
     try {
+      let conditions: SQL[] = [eq(articles.userId, userId)];
+
+      // Text search using PostgreSQL's full-text search
+      if (query?.trim()) {
+        const searchQuery = query.trim().toLowerCase();
+        conditions.push(
+          or(
+            sql`to_tsvector('english', ${articles.title}) @@ plainto_tsquery('english', ${searchQuery})`,
+            sql`to_tsvector('english', ${articles.content}) @@ plainto_tsquery('english', ${searchQuery})`,
+            sql`to_tsvector('english', COALESCE(${articles.description}, '')) @@ plainto_tsquery('english', ${searchQuery})`
+          )
+        );
+      }
+
+      // Tag filtering - articles must have ALL specified tags
+      if (tags?.length) {
+        conditions.push(sql`${articles.tags} @> ${sql.array(tags, 'text')}`);
+      }
+
       return await db
         .select()
         .from(articles)
         .where(and(...conditions))
-        .orderBy(articles.created);
+        .orderBy(desc(articles.created));
     } catch (error) {
       console.error('Search error:', error);
       return [];
