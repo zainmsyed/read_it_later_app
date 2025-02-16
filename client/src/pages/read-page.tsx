@@ -701,6 +701,16 @@ export default function ReadPage() {
 
       <main className="max-w-prose mx-auto px-4 py-24">
         <article className="prose prose-lg dark:prose-invert">
+          {article.url.includes("youtube.com") && (
+            <div className="mb-8 aspect-video">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${new URL(article.url).searchParams.get('v')}`}
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            </div>
+          )}
           <h1 className="mb-8">{article.title}</h1>
           <div className="article-content markdown-content">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
