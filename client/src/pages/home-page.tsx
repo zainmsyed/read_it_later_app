@@ -20,6 +20,7 @@ export default function HomePage() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTag, setCurrentTag] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -58,6 +59,14 @@ export default function HomePage() {
     }
   };
 
+  const toggleTagFilter = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
   const addArticleMutation = useMutation({
     mutationFn: async (data: { url: string; tags: string[] }) => {
       const res = await apiRequest("POST", "/api/articles", data);
@@ -80,6 +89,12 @@ export default function HomePage() {
         variant: "destructive",
       });
     },
+  });
+
+  // Filter articles based on selected tags
+  const filteredArticles = articles?.filter(article => {
+    if (selectedTags.length === 0) return true;
+    return selectedTags.every(tag => article.tags?.includes(tag));
   });
 
   if (isLoading) {
@@ -230,6 +245,24 @@ export default function HomePage() {
               Archive
             </Button>
           </Link>
+
+          {existingTags.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-sm font-semibold mb-2">Filter by Tags</h2>
+              <div className="flex flex-wrap gap-2">
+                {existingTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => toggleTagFilter(tag)}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="absolute bottom-4 left-4 right-4 space-y-1">
@@ -253,19 +286,30 @@ export default function HomePage() {
 
       <div className="flex-1 p-8">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">Reading List</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold">Reading List</h2>
+            {selectedTags.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
+                Clear Filters
+              </Button>
+            )}
+          </div>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-border" />
             </div>
-          ) : articles?.length === 0 ? (
+          ) : filteredArticles?.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>No articles saved yet. Click "Add Article" to get started.</p>
+              <p>
+                {selectedTags.length > 0
+                  ? "No articles found with the selected tags."
+                  : "No articles saved yet. Click 'Add Article' to get started."}
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {articles?.map((article) => (
+              {filteredArticles?.map((article) => (
                 <Link key={article.id} href={`/read/${article.id}`}>
                   <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
                     <CardContent className="p-6">
