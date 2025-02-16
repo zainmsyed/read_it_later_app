@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,7 @@ export default function HomePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentTag, setCurrentTag] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -91,7 +92,6 @@ export default function HomePage() {
     },
   });
 
-  // Filter articles based on selected tags
   const filteredArticles = articles?.filter(article => {
     if (selectedTags.length === 0) return true;
     return selectedTags.every(tag => article.tags?.includes(tag));
@@ -107,186 +107,227 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Fixed Sidebar */}
-      <div className="fixed top-0 left-0 w-64 h-screen bg-muted border-r border-border p-4 overflow-y-auto">
-        <div className="flex items-center gap-2 mb-8">
-          <BookOpenText className="h-6 w-6" />
-          <h1 className="text-xl font-semibold">ReadLater</h1>
-        </div>
-
-        <div className="space-y-1">
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Article
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Article</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>URL</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="https://..." disabled={addArticleMutation.isPending} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="tags"
-                    render={() => (
-                      <FormItem>
-                        <FormLabel>Tags</FormLabel>
-                        <FormControl>
-                          <div className="space-y-4">
-                            <div className="flex gap-2">
-                              <Input
-                                value={currentTag}
-                                onChange={(e) => setCurrentTag(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    addTag();
-                                  }
-                                }}
-                                placeholder="Add tags..."
-                                disabled={addArticleMutation.isPending}
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={addTag}
-                                disabled={addArticleMutation.isPending}
-                              >
-                                <Tag className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            {form.watch("tags").length > 0 && (
-                              <div className="flex flex-wrap gap-2">
-                                {form.watch("tags").map((tag) => (
-                                  <Badge key={tag} variant="secondary" className="gap-1">
-                                    {tag}
-                                    <button
-                                      type="button"
-                                      onClick={() => removeTag(tag)}
-                                      className="ml-1 hover:text-destructive"
-                                      disabled={addArticleMutation.isPending}
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </button>
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                            {existingTags.length > 0 && (
-                              <div className="space-y-2">
-                                <p className="text-sm text-muted-foreground">Existing tags:</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {existingTags
-                                    .filter(tag => !form.watch("tags").includes(tag))
-                                    .map((tag) => (
-                                      <Badge
-                                        key={tag}
-                                        variant="outline"
-                                        className="cursor-pointer hover:bg-muted"
-                                        onClick={() => addExistingTag(tag)}
-                                      >
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={addArticleMutation.isPending}
-                  >
-                    {addArticleMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      'Save Article'
-                    )}
-                  </Button>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-
-          <Link href="/">
-            <Button variant="ghost" className="w-full justify-start" size="sm">
-              <BookOpenText className="h-4 w-4 mr-2" />
-              Reading List
-            </Button>
-          </Link>
-          <Link href="/archive">
-            <Button variant="ghost" className="w-full justify-start" size="sm">
-              <Archive className="h-4 w-4 mr-2" />
-              Archive
-            </Button>
-          </Link>
-
-          {existingTags.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold mb-2">Filter by Tags</h2>
-              <div className="flex flex-wrap gap-2">
-                {existingTags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant={selectedTags.includes(tag) ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => toggleTagFilter(tag)}
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+      <div 
+        className={`fixed top-0 left-0 h-screen bg-muted border-r border-border overflow-y-auto transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'w-16' : 'w-64'
+        }`}
+      >
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-8">
+            {!isSidebarCollapsed && (
+              <div className="flex items-center gap-2">
+                <BookOpenText className="h-6 w-6" />
+                <h1 className="text-xl font-semibold">ReadLater</h1>
               </div>
-            </div>
-          )}
-        </div>
-
-        <div className="absolute bottom-4 left-4 right-4 space-y-1">
-          <Link href="/settings">
-            <Button variant="ghost" className="w-full justify-start" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="ml-auto"
+            >
+              {isSidebarCollapsed ? (
+                <PanelRightClose className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
             </Button>
-          </Link>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            size="sm"
-            onClick={() => logoutMutation.mutate()}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
+          </div>
+
+          <div className="space-y-1">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  {!isSidebarCollapsed && <span className="ml-2">Add Article</span>}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Article</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>URL</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="https://..." disabled={addArticleMutation.isPending} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel>Tags</FormLabel>
+                          <FormControl>
+                            <div className="space-y-4">
+                              <div className="flex gap-2">
+                                <Input
+                                  value={currentTag}
+                                  onChange={(e) => setCurrentTag(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      addTag();
+                                    }
+                                  }}
+                                  placeholder="Add tags..."
+                                  disabled={addArticleMutation.isPending}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={addTag}
+                                  disabled={addArticleMutation.isPending}
+                                >
+                                  <Tag className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              {form.watch("tags").length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {form.watch("tags").map((tag) => (
+                                    <Badge key={tag} variant="secondary" className="gap-1">
+                                      {tag}
+                                      <button
+                                        type="button"
+                                        onClick={() => removeTag(tag)}
+                                        className="ml-1 hover:text-destructive"
+                                        disabled={addArticleMutation.isPending}
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                              {existingTags.length > 0 && (
+                                <div className="space-y-2">
+                                  <p className="text-sm text-muted-foreground">Existing tags:</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {existingTags
+                                      .filter(tag => !form.watch("tags").includes(tag))
+                                      .map((tag) => (
+                                        <Badge
+                                          key={tag}
+                                          variant="outline"
+                                          className="cursor-pointer hover:bg-muted"
+                                          onClick={() => addExistingTag(tag)}
+                                        >
+                                          {tag}
+                                        </Badge>
+                                      ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={addArticleMutation.isPending}
+                    >
+                      {addArticleMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Article'
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+
+            <Link href="/">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                size="sm"
+              >
+                <BookOpenText className="h-4 w-4" />
+                {!isSidebarCollapsed && <span className="ml-2">Reading List</span>}
+              </Button>
+            </Link>
+
+            <Link href="/archive">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                size="sm"
+              >
+                <Archive className="h-4 w-4" />
+                {!isSidebarCollapsed && <span className="ml-2">Archive</span>}
+              </Button>
+            </Link>
+
+            {existingTags.length > 0 && !isSidebarCollapsed && (
+              <div className="mt-6">
+                <h2 className="text-sm font-semibold mb-2">Filter by Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {existingTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant={selectedTags.includes(tag) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleTagFilter(tag)}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="absolute bottom-4 left-4 right-4 space-y-1">
+            <Link href="/settings">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                size="sm"
+              >
+                <Settings className="h-4 w-4" />
+                {!isSidebarCollapsed && <span className="ml-2">Settings</span>}
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`}
+              size="sm"
+              onClick={() => logoutMutation.mutate()}
+            >
+              <LogOut className="h-4 w-4" />
+              {!isSidebarCollapsed && <span className="ml-2">Logout</span>}
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content - Add margin to prevent overlap with sidebar */}
-      <div className="flex-1 ml-64 p-8">
+      <div 
+        className={`flex-1 p-8 transition-all duration-300 ease-in-out ${
+          isSidebarCollapsed ? 'ml-16' : 'ml-64'
+        }`}
+      >
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <div className="space-y-2">
