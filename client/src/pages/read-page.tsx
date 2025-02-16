@@ -715,10 +715,13 @@ export default function ReadPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        updateHighlightMutation.mutate({ 
-                          id: highlight.id, 
-                          note: prompt('Edit note:', highlight.note || '') || '' 
-                        });
+                        const newNote = prompt('Edit note:', highlight.note || '');
+                        if (newNote !== null) {
+                          updateHighlightMutation.mutate({ 
+                            id: highlight.id, 
+                            note: newNote 
+                          });
+                        }
                       }}
                       className="text-muted-foreground"
                     >
