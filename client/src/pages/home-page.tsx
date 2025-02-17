@@ -280,7 +280,7 @@ export default function HomePage() {
           <div className="article-grid">
             {filteredArticles?.map((article) => (
               <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
-                <CardContent className="p-6 flex justify-between items-start">
+                <CardContent className="p-6 relative">
                   <Link href={`/read/${article.id}`} className="flex-1">
                     <CardTitle className="mb-3 hover:text-primary article-title">{article.title}</CardTitle>
                     {article.description && (
@@ -334,7 +334,9 @@ export default function HomePage() {
                       </div>
                     )}
                     {article.notes && (
-                      <StickyNote className="h-4 w-4 text-black dark:text-white" />
+                      <div className="absolute bottom-2 right-2">
+                        <StickyNote className="h-4 w-4 text-black dark:text-white" />
+                      </div>
                     )}
                     <Button
                       variant="ghost"
