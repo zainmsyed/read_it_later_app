@@ -121,8 +121,9 @@ export default function HomePage() {
           credentials: 'include'
         });
         
+        const uploadData = await uploadRes.json();
         if (!uploadRes.ok) {
-          throw new Error('Failed to upload file');
+          throw new Error(uploadData.message || 'Failed to upload file');
         }
         
         const { url: fileUrl } = await uploadRes.json();
