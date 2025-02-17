@@ -403,13 +403,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
-      // Create uploads directory if it doesn't exist
-      const uploadsDir = './uploads';
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      await fs.promises.mkdir(uploadsDir, { recursive: true });
+
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
+      
+      if (!allowedTypes.includes(ext)) {
+        return res.status(400).json({ 
+          message: `Invalid file type. Allowed types: ${allowedTypes.join(', ')}` 
+        });
       }
 
-      const ext = path.extname(req.file.originalname);
       const filename = `${req.user.id}-${Date.now()}${ext}`;
       const filepath = path.join(uploadsDir, filename);
       
