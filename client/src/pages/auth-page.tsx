@@ -33,7 +33,7 @@ export default function AuthPage() {
         <CardContent className="p-6">
           <h1 className="newspaper-title text 4xl mb-8">Postea</h1>
           <div className="newspaper-subtitle mb-8">
-            THE WORLD'S FINEST READING LIST • SINCE 2024
+            CAPTURE • READ • REMEMBER
           </div>
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">

@@ -174,7 +174,7 @@ export default function HomePage() {
           </div>
           <h1 className="newspaper-title">Postea</h1>
           <div className="newspaper-subtitle">
-            THE WORLD'S FINEST READING LIST • SINCE 2024
+            CAPTURE • READ • REMEMBER
           </div>
         </div>
 
