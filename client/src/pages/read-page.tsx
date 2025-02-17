@@ -386,7 +386,7 @@ const createHighlightMutation = useMutation({
                     variant="ghost"
                     className={cn(
                       "text-muted-foreground hover:text-foreground rounded-full",
-                      article.read && "text-green-500 bg-green-500/10"
+                      article.read && "text-black dark:text-white bg-black/10 dark:bg-white/10"
                     )}
                     onClick={() => updateArticleMutation.mutate({ read: !article.read })}
                   >
