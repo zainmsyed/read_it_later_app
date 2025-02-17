@@ -5,7 +5,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose, RefreshCw, Trash2, SearchIcon } from "lucide-react";
+import { Loader2, BookOpenText, Settings, LogOut, Archive, Plus, Tag, X, PanelLeftClose, PanelRightClose, RefreshCw, Trash2, SearchIcon, Menu } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -16,6 +16,8 @@ import { useState } from "react";
 import { SearchCommandPalette } from "@/components/ui/search-command";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+
 
 export default function HomePage() {
   const updateArticleMutation = useMutation({
@@ -187,25 +189,7 @@ export default function HomePage() {
           </div>
 
           <div className="absolute bottom-4 left-4 right-4 space-y-1">
-            <Link href="/settings">
-              <Button 
-                variant="ghost" 
-                className="w-full flex items-center justify-start" 
-                size="sm"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="ml-2">Settings</span>
-              </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              className="w-full flex items-center justify-start"
-              size="sm"
-              onClick={() => logoutMutation.mutate()}
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="ml-2">Logout</span>
-            </Button>
+            {/* Removed existing settings and logout buttons */}
           </div>
         </div>
       </div>
@@ -215,9 +199,32 @@ export default function HomePage() {
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="flex items-center gap-2">
-              <BookOpenText className="h-8 w-8" />
-              <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
+            <div className="flex items-center justify-between w-full">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <Link href="/settings">
+                    <DropdownMenuItem>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Settings
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                <BookOpenText className="h-8 w-8" />
+                <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
+              </div>
+              <div className="w-10" /> {/* Spacer for balance */}
             </div>
             <div className="flex items-center justify-center gap-2 w-full">
               <Button
