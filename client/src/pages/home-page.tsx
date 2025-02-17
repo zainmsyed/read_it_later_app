@@ -474,8 +474,8 @@ export default function HomePage() {
                     <div className="flex gap-2">
                       {/* Added read status indicator */}
                       {article.isRead && (
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
-                          <Check className="h-4 w-4" />
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 border border-green-500">
+                          <Check className="h-4 w-4 text-green-500" />
                         </div>
                       )}
                       <Button
