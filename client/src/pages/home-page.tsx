@@ -359,25 +359,26 @@ export default function HomePage() {
               <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
             </div>
             <div className="flex items-center justify-between w-full">
-              <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : 'Reading List'}</h2>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSearchOpen(true)}
-              >
-                <SearchIcon className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
-                }}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
+              <div className="flex items-center gap-4 w-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full flex justify-start gap-2"
+                  onClick={() => setSearchOpen(true)}
+                >
+                  <SearchIcon className="h-4 w-4" />
+                  <span className="text-muted-foreground">Search articles...</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
           </div>
           {selectedTags.length > 0 && (
             <div className="flex-1 flex items-center gap-2">
