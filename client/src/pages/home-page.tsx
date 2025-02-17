@@ -279,7 +279,7 @@ export default function HomePage() {
         ) : (
           <div className="article-grid">
             {filteredArticles?.map((article) => (
-              <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
+              <Card key={article.id} className={`hover:bg-muted/50 transition-colors article-list ${article.read ? 'bg-muted/30' : ''}`}>
                 <CardContent className="p-6 flex justify-between items-start">
                   <Link href={`/read/${article.id}`} className="flex-1">
                     <CardTitle className="mb-3 hover:text-primary article-title">{article.title}</CardTitle>
