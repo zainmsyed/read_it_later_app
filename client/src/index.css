@@ -24,6 +24,28 @@
   margin-bottom: 1.5rem;
 }
 
+.article-content table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+
+.article-content th {
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.article-content td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-content tr:hover {
+  background-color: var(--muted);
+}
+
 .article-list {
   font-family: Charter, Georgia, serif;
 }
