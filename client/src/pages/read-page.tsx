@@ -818,6 +818,7 @@ const createHighlightMutation = useMutation({
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          setSelectedHighlightId(highlight.id);
                           setSelectedText(highlight.text);
                           setHighlightNote(highlight.note || '');
                           setHighlightColor(highlight.color || 'yellow');
