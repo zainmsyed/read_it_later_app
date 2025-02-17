@@ -11,7 +11,7 @@
   }
   
   body {
-    @apply bg-[#f4f1ea];
+    @apply bg-background;
   }
 }
 
