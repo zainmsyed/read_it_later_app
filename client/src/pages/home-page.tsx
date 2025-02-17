@@ -178,7 +178,7 @@ export default function HomePage() {
               <DialogTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                  className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'} bg-green-500/10 hover:bg-green-500/20`} 
                   size="sm"
                 >
                   <Plus className="h-6 w-6" />
