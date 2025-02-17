@@ -295,14 +295,14 @@ const createHighlightMutation = useMutation({
 
     let content = article.content;
     const sortedHighlights = [...highlights].sort((a, b) => 
-      parseInt(a.startOffset) - parseInt(b.startOffset)
+      parseInt(b.startOffset) - parseInt(a.startOffset)
     );
 
     for (const highlight of sortedHighlights) {
       const start = parseInt(highlight.startOffset);
       const end = parseInt(highlight.endOffset);
       content = content.slice(0, start) +
-        `<span class="highlight-text" style="background-color: ${highlight.color}; display: inline;">${content.slice(start, end)}</span>` +
+        `<mark style="background-color: ${highlight.color}; opacity: 0.5; padding: 2px;">${content.slice(start, end)}</mark>` +
         content.slice(end);
     }
 
