@@ -186,22 +186,6 @@ export default function HomePage() {
             </Button>
           </Link>
 
-          {existingTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm font-semibold">Tags:</span>
-              {existingTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={selectedTags.includes(tag) ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => toggleTagFilter(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-
           <div className="flex items-center gap-2">
             <div className="flex-1 max-w-2xl">
               <div className="relative">
@@ -239,6 +223,23 @@ export default function HomePage() {
 
           </div>
         </div>
+        
+        {existingTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 items-center justify-center mt-4">
+            <span className="text-sm font-semibold">Tags:</span>
+            {existingTags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                className="cursor-pointer"
+                onClick={() => toggleTagFilter(tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+
         {selectedTags.length > 0 && (
           <div className="flex-1 flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Filtered by:</span>
