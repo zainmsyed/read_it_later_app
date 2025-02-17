@@ -376,21 +376,6 @@ export default function ReadPage() {
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={startEditing}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Tag className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Edit Tags</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
                     className={cn(
                       "text-muted-foreground hover:text-foreground",
                       article.read && "text-foreground"
@@ -401,6 +386,21 @@ export default function ReadPage() {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Mark as {article.read ? 'Unread' : 'Read'}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={startEditing}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Tag className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Edit Tags</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             <TooltipProvider>
