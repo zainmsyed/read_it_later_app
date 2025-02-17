@@ -178,7 +178,7 @@ export default function HomePage() {
               <DialogTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} hover:bg-muted/50 transition-all duration-200 h-10`} 
+                  className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                   size="sm"
                 >
                   <Plus className="h-5 w-5 text-muted-foreground/70" />
@@ -300,7 +300,7 @@ export default function HomePage() {
             <Link href="/">
               <Button 
                 variant="ghost" 
-                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                 size="sm"
               >
                 <BookOpenText className="h-4 w-4" />
@@ -333,7 +333,7 @@ export default function HomePage() {
             <Link href="/settings">
               <Button 
                 variant="ghost" 
-                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                 size="sm"
               >
                 <Settings className="h-4 w-4" />
@@ -342,7 +342,7 @@ export default function HomePage() {
             </Link>
             <Button
               variant="ghost"
-              className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`}
+              className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`}
               size="sm"
               onClick={() => logoutMutation.mutate()}
             >
