@@ -333,6 +333,11 @@ export default function HomePage() {
                         <Check className="h-4 w-4 text-green-500" />
                       </div>
                     )}
+                    {article.notes && (
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500">
+                        <StickyNote className="h-4 w-4 text-blue-500" />
+                      </div>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
