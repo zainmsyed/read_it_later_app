@@ -368,15 +368,7 @@ const createHighlightMutation = useMutation({
             </TooltipTrigger>
             <TooltipContent side="bottom">Back to Home</TooltipContent>
           </Tooltip>
-          <div className="flex-1 flex items-center mx-4">
-            <div className="flex flex-wrap gap-2">
-              {article.tags?.map((tag) => (
-                <Badge key={tag} variant="secondary" className="bg-background/40 text-muted-foreground">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+          <div className="flex-1" />
           <div className="flex items-center justify-end gap-2 ml-auto">
             <TooltipProvider>
               <Tooltip>
