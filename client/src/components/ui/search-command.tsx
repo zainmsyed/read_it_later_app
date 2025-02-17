@@ -146,8 +146,9 @@ export function SearchCommandPalette({
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <Command className="rounded-lg border shadow-md">
-        <div className="flex items-center gap-2 p-2">
+        <div className="flex items-center gap-2 p-2 w-full">
           <CommandInput
+            className="flex-1"
             placeholder="Search articles..."
             value={search}
             onValueChange={setSearch}
