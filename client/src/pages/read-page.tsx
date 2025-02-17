@@ -763,11 +763,20 @@ const createHighlightMutation = useMutation({
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer" 
-                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-2"
                 >
                   <FileText className="h-4 w-4" />
                   {article.url}
                 </a>
+                {article.tags && article.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {article.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="bg-muted/40">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
             {article.url.includes("youtube.com") && (
               <div className="mb-8 aspect-video">
                 <iframe
