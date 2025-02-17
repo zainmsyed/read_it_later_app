@@ -270,8 +270,11 @@ export default function HomePage() {
                                 variant="outline"
                                 className="cursor-pointer hover:bg-muted"
                                 onClick={() => {
-                                  const currentTags = form.getValues("tags");
-                                  form.setValue("tags", [...currentTags, tag], { shouldDirty: true });
+                                  const currentTags = form.getValues("tags") || [];
+                                  if (!currentTags.includes(tag)) {
+                                    form.setValue("tags", [...currentTags, tag], { shouldDirty: true, shouldValidate: true });
+                                    form.trigger("tags");
+                                  }
                                 }}
                               >
                                 {tag}
