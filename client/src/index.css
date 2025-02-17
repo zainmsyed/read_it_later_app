@@ -30,7 +30,7 @@
 .newspaper-title {
   @apply text-center mb-8;
   font-family: "EB Garamond", Georgia, serif;
-  font-size: 4.5rem;
+  font-size: 5.625rem;
   letter-spacing: -1px;
   font-weight: 700;
   line-height: 1;
