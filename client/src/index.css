@@ -24,6 +24,24 @@
   margin-bottom: 1.5rem;
 }
 
+.article-list {
+  font-family: Charter, Georgia, serif;
+}
+
+.article-list .article-title {
+  font-family: Charter, Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.article-list .article-description {
+  font-family: Charter, Georgia, serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
 @layer base {
   * {
     @apply border-border;

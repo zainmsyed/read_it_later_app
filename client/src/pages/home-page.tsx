@@ -424,12 +424,12 @@ export default function HomePage() {
           ) : (
             <div className="space-y-4">
               {filteredArticles?.map((article) => (
-                <Card key={article.id} className="hover:bg-muted/50 transition-colors">
+                <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
                   <CardContent className="p-6 flex justify-between items-start">
                     <Link href={`/read/${article.id}`} className="flex-1">
-                      <CardTitle className="mb-2 hover:text-primary">{article.title}</CardTitle>
+                      <CardTitle className="mb-3 hover:text-primary article-title">{article.title}</CardTitle>
                       {article.description && (
-                        <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
+                        <p className="article-description line-clamp-2 mb-4">
                           {article.description}
                         </p>
                       )}
