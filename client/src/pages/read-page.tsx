@@ -151,19 +151,34 @@ const createHighlightMutation = useMutation({
   });
 
 
+  const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
+
   useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
-      if (!selection || selection.isCollapsed) return;
+      if (!selection || selection.isCollapsed) {
+        setSelectionPosition(null);
+        return;
+      }
 
       const range = selection.getRangeAt(0);
       const content = range.commonAncestorContainer.parentElement;
 
       // Only allow highlighting within the article content
-      if (!content?.closest('.article-content')) return;
+      if (!content?.closest('.article-content')) {
+        setSelectionPosition(null);
+        return;
+      }
 
       const text = selection.toString().trim();
       if (text) {
+        // Get selection coordinates
+        const rect = range.getBoundingClientRect();
+        setSelectionPosition({
+          x: rect.left + (rect.width / 2),
+          y: rect.top - 10
+        });
+
         // Calculate text position
         const articleContent = document.querySelector('.article-content');
         if (!articleContent) return;
@@ -197,7 +212,6 @@ const createHighlightMutation = useMutation({
           setSelectedText(text);
           setHighlightColor("yellow"); // Reset color to default
           setHighlightNote(""); // Reset note
-          setIsCreatingHighlight(true);
         }
       }
     };
@@ -359,6 +373,34 @@ const createHighlightMutation = useMutation({
   return (
     <TooltipProvider>
       <div className="min-h-screen">
+        {selectionPosition && (
+          <div
+            className="fixed z-50 transform -translate-x-1/2 bg-background border rounded-full shadow-lg animate-in fade-in-0 zoom-in-95"
+            style={{
+              left: selectionPosition.x,
+              top: selectionPosition.y
+            }}
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="rounded-full"
+                    onClick={() => {
+                      setIsCreatingHighlight(true);
+                      setSelectionPosition(null);
+                    }}
+                  >
+                    <Highlighter className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Highlight Selection</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
         <header className="fixed top-0 left-0 right-0 h-12 bg-background/60 backdrop-blur-md border-b border-border/50 flex items-center px-4 z-10 transition-all duration-200 hover:bg-background/80">
           <Tooltip>
             <TooltipTrigger asChild>
