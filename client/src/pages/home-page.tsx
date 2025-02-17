@@ -152,13 +152,7 @@ export default function HomePage() {
         }`}
       >
         <div className="p-6">
-          <div className="flex items-center justify-between mb-10">
-            {!isSidebarCollapsed && (
-              <div className="flex items-center gap-3">
-                <BookOpenText className="h-6 w-6" />
-                <h1 className="text-xl font-medium tracking-tight">Postea</h1>
-              </div>
-            )}
+          <div className="flex items-center justify-end mb-10">
             <Button
               variant="ghost"
               size="sm"
@@ -359,8 +353,13 @@ export default function HomePage() {
         }`}
       >
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : 'Reading List'}</h2>
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="flex items-center gap-2">
+              <BookOpenText className="h-8 w-8" />
+              <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
+            </div>
+            <div className="flex items-center justify-between w-full">
+              <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : 'Reading List'}</h2>
             <div className="flex gap-2">
               <Button
                 variant="outline"
