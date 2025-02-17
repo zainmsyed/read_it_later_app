@@ -128,7 +128,7 @@
 }
 
 .sidebar-icon {
-  @apply h-10 w-10 text-muted-foreground/70; /* Increased size */
+  @apply h-16 w-16 text-muted-foreground/70; /* Increased size to 200% */
   @apply transition-all duration-200;
 }
 
