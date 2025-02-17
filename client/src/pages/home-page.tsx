@@ -198,7 +198,7 @@ export default function HomePage() {
               <DialogTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className="flex items-center gap-2 bg-green-500/30 hover:bg-green-500/40 text-green-700 dark:text-green-300"
+                  className="flex items-center gap-2 bg-black/90 hover:bg-black/70 text-white dark:bg-white dark:text-black dark:hover:bg-white/90"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Add Article</span>
