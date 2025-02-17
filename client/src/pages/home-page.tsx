@@ -498,7 +498,7 @@ export default function HomePage() {
           )}
         </div>
       </div>
-    {/* Tag Editing Dialog */}
+      {/* Tag Editing Dialog */}
       <Dialog open={isEditingTags} onOpenChange={(open) => !open && setIsEditingTags(false)}>
         <DialogContent className="sm:max-w-[425px] gap-6">
           <div className="space-y-4">
