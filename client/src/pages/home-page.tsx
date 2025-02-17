@@ -181,7 +181,7 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-wrap gap-4 items-center justify-center">
-          
+
 
           <div className="flex items-center gap-2">
             <div className="flex-1 max-w-2xl">
@@ -225,6 +225,40 @@ export default function HomePage() {
                       )}
                     />
                     <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <Input
+                          value={currentTag}
+                          onChange={(e) => setCurrentTag(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addTag();
+                            }
+                          }}
+                          placeholder="Add tags..."
+                        />
+                        <Button type="button" variant="outline" onClick={addTag}>
+                          <Tag className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {form.getValues("tags").length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {form.getValues("tags").map((tag) => (
+                            <Badge key={tag} className="gap-1">
+                              {tag}
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  removeTag(tag);
+                                }}
+                                className="hover:text-destructive"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                       <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">Available tags:</p>
                         <div className="flex flex-wrap gap-2">
@@ -245,46 +279,12 @@ export default function HomePage() {
                             ))}
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                      <Input
-                        value={currentTag}
-                        onChange={(e) => setCurrentTag(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            addTag();
-                          }
-                        }}
-                        placeholder="Add tags..."
-                      />
-                      <Button type="button" variant="outline" onClick={addTag}>
-                        <Tag className="h-4 w-4" />
+                    
+                      <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
+                        {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save Article
                       </Button>
                     </div>
-                    {form.getValues("tags").length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {form.getValues("tags").map((tag) => (
-                          <Badge key={tag} className="gap-1">
-                            {tag}
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                removeTag(tag);
-                              }}
-                              className="hover:text-destructive"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    
-                    <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
-                      {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Save Article
-                    </Button>
-                  </div>
                   </form>
                 </Form>
               </DialogContent>
@@ -302,7 +302,7 @@ export default function HomePage() {
 
           </div>
         </div>
-        
+
         {existingTags.length > 0 && (
           <div className="flex flex-wrap gap-2 items-center justify-center mt-4">
             <span className="text-sm font-semibold">Tags:</span>
