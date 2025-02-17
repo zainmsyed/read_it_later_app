@@ -255,7 +255,7 @@ const createHighlightMutation = useMutation({
 
 
   const createHighlight = () => {
-    if ((!selectionRange || !selectedText) && !selectedHighlightId) {
+    if (!selectedHighlightId && (!selectionRange || !selectedText)) {
       toast({
         title: "Error",
         description: "Please select some text first",
