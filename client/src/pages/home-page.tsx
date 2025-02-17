@@ -181,7 +181,7 @@ export default function HomePage() {
                   className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                   size="sm"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-6 w-6" />
                   {!isSidebarCollapsed && <span className="ml-3 font-medium text-muted-foreground/70">Add Article</span>}
                 </Button>
               </DialogTrigger>
@@ -303,7 +303,7 @@ export default function HomePage() {
                 className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                 size="sm"
               >
-                <BookOpenText className="h-4 w-4" />
+                <BookOpenText className="h-6 w-6" />
                 {!isSidebarCollapsed && <span className="ml-3">Reading List</span>}
               </Button>
             </Link>
