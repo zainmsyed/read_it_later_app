@@ -147,7 +147,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen flex">
       <div className="fixed top-0 left-0 h-screen w-64 bg-muted border-r border-border overflow-y-auto">
-        <div className="p-4">
+        <div className="p-8">
 
           <div className="space-y-1">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
