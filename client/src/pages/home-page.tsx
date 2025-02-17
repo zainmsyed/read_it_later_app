@@ -181,8 +181,8 @@ export default function HomePage() {
                   className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                   size="sm"
                 >
-                  <Plus className="h-5 w-5 text-muted-foreground/70" />
-                  {!isSidebarCollapsed && <span className="ml-4 font-medium text-muted-foreground/70">Add Article</span>}
+                  <Plus className="h-4 w-4" />
+                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-muted-foreground/70">Add Article</span>}
                 </Button>
               </DialogTrigger>
               <DialogContent>
