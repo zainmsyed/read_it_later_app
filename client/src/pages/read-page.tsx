@@ -932,7 +932,6 @@ const createHighlightMutation = useMutation({
                 </ReactMarkdown>
               </div>
             </div>
-            </div>
           )}
         </main>
       </div>
