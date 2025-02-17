@@ -287,7 +287,7 @@ export default function HomePage() {
                             ))}
                         </div>
                       </div>
-
+                    
                       <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
                         {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Save Article
@@ -419,7 +419,7 @@ export default function HomePage() {
                     )}
                   </Link>
                   <div className="flex items-center justify-end gap-4">
-                    {(article.notes || article.highlights?.length > 0) && (
+                    {article.notes && (
                       <StickyNote className="h-4 w-4 text-black dark:text-white" />
                     )}
                     <Button
