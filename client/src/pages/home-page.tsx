@@ -274,22 +274,7 @@ export default function HomePage() {
                             </Badge>
                           ))}
                       </div>
-                    </div>-2">
-                          {existingTags
-                            .filter(tag => !form.getValues("tags").includes(tag))
-                            .map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="outline"
-                                className="cursor-pointer hover:bg-muted"
-                                onClick={() => addExistingTag(tag)}
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                        </div>
-                      </div>
-                    )}
+                    </div>
                     <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
                       {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Article
