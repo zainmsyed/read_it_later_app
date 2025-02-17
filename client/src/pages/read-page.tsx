@@ -304,7 +304,7 @@ const createHighlightMutation = useMutation({
       const end = parseInt(highlight.endOffset);
 
       content = content.slice(0, start) +
-        `<span class="highlight" style="background-color: ${highlight.color}; opacity: 0.4; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
+        `<span class="highlight" style="background-color: ${highlight.color}80; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
         content.slice(end);
     }
 
