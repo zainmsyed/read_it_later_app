@@ -100,14 +100,14 @@ export default function ReadPage() {
 const createHighlightMutation = useMutation({
     mutationFn: async (data: { text: string; startOffset: string; endOffset: string; color?: string; note?: string }) => {
       if (selectedHighlightId) {
-        await apiRequest("PATCH", `/api/highlights/${selectedHighlightId}`, data);
+        return await apiRequest("PATCH", `/api/highlights/${selectedHighlightId}`, data);
       } else {
-        await apiRequest("POST", `/api/articles/${params?.id}/highlights`, data);
+        return await apiRequest("POST", `/api/articles/${params?.id}/highlights`, data);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}/highlights`] });
-      toast({ title: "Highlight saved" });
+      toast({ title: selectedHighlightId ? "Highlight updated" : "Highlight saved" });
       setIsCreatingHighlight(false);
       setSelectedText("");
       setHighlightColor("yellow");
