@@ -224,7 +224,25 @@ export default function HomePage() {
                         </FormItem>
                       )}
                     />
-                    <div className="flex gap-2">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Available tags:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {existingTags
+                            .filter(tag => !form.getValues("tags").includes(tag))
+                            .map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="outline"
+                                className="cursor-pointer hover:bg-muted"
+                                onClick={() => addExistingTag(tag)}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
                       <Input
                         value={currentTag}
                         onChange={(e) => setCurrentTag(e.target.value)}
@@ -258,23 +276,7 @@ export default function HomePage() {
                         ))}
                       </div>
                     )}
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Available tags:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {existingTags
-                          .filter(tag => !form.getValues("tags").includes(tag))
-                          .map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className="cursor-pointer hover:bg-muted"
-                              onClick={() => addExistingTag(tag)}
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                      </div>
-                    </div>
+                    
                     <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
                       {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Article
