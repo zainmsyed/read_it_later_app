@@ -139,6 +139,11 @@ export default function HomePage() {
           }),
           credentials: 'include'
         });
+        const responseData = await res.json();
+        if (!res.ok) {
+          throw new Error(responseData.message || "Failed to save article");
+        }
+        return responseData;
       } else {
         const res = await fetch('/api/articles', {
           method: 'POST',
@@ -151,11 +156,12 @@ export default function HomePage() {
           }),
           credentials: 'include'
         });
-      const responseData = await res.json();
-      if (!res.ok) {
-        throw new Error(responseData.message || "Failed to save article");
+        const responseData = await res.json();
+        if (!res.ok) {
+          throw new Error(responseData.message || "Failed to save article");
+        }
+        return responseData;
       }
-      return responseData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/articles"] });
