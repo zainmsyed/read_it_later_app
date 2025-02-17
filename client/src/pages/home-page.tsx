@@ -177,12 +177,12 @@ export default function HomePage() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  variant="default"
-                  className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} bg-primary/90 hover:bg-primary shadow-sm transition-all duration-200`} 
+                  variant="ghost"
+                  className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} hover:bg-muted/50 transition-all duration-200 h-10`} 
                   size="sm"
                 >
-                  <Plus className="h-4 w-4" />
-                  {!isSidebarCollapsed && <span className="ml-2 font-medium">Add Article</span>}
+                  <Plus className="h-4 w-4 text-muted-foreground/70" />
+                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-muted-foreground/70">Add Article</span>}
                 </Button>
               </DialogTrigger>
               <DialogContent>
