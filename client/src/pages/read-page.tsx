@@ -369,7 +369,7 @@ export default function ReadPage() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-end gap-2 ml-auto">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -418,26 +418,26 @@ export default function ReadPage() {
                 <TooltipContent side="bottom">Export Notes</TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                        deleteArticleMutation.mutate();
+                      }
+                    }}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Delete Article</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                      deleteArticleMutation.mutate();
-                    }
-                  }}
-                  className="text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Delete Article</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </header>
 
         {/* Highlight Creation Dialog */}
