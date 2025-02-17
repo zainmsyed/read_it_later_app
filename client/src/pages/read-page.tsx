@@ -289,31 +289,32 @@ const createHighlightMutation = useMutation({
   };
 
   const renderHighlightedContent = () => {
-    if (!article?.content || !highlights.length) {
+    if (!article?.content) {
       return article?.content;
     }
 
     let content = article.content;
-    // Sort highlights in reverse order (highest offset first) to avoid position shifting
-    const sortedHighlights = [...highlights].sort((a, b) =>
-      parseInt(b.startOffset) - parseInt(a.startOffset)
-    );
+    if (highlights.length > 0) {
+      const sortedHighlights = [...highlights].sort((a, b) =>
+        parseInt(b.startOffset) - parseInt(a.startOffset)
+      );
 
-    for (const highlight of sortedHighlights) {
-      const start = parseInt(highlight.startOffset);
-      const end = parseInt(highlight.endOffset);
-      const color = highlight.color || 'yellow';
-      const backgroundColor = {
-        'yellow': '#fff98033',
-        'green': '#86efac33',
-        'blue': '#93c5fd33',
-        'pink': '#f9a8d433',
-        'purple': '#d8b4fe33'
-      }[color] || '#fff98033';
+      for (const highlight of sortedHighlights) {
+        const start = parseInt(highlight.startOffset);
+        const end = parseInt(highlight.endOffset);
+        const color = highlight.color || 'yellow';
+        const backgroundColor = {
+          'yellow': '#ffeb3b',
+          'green': '#4caf50',
+          'blue': '#2196f3',
+          'pink': '#e91e63',
+          'purple': '#9c27b0'
+        }[color] || '#ffeb3b';
 
-      content = content.slice(0, start) +
-        `<span class="highlight" style="background-color: ${backgroundColor}; padding: 0 1px; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
+        content = content.slice(0, start) +
+          `<mark class="highlight" style="background-color: ${backgroundColor}; opacity: 0.3; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</mark>` +
         content.slice(end);
+      }
     }
 
     return content;
