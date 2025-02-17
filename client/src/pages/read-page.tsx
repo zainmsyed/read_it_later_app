@@ -302,9 +302,17 @@ const createHighlightMutation = useMutation({
     for (const highlight of sortedHighlights) {
       const start = parseInt(highlight.startOffset);
       const end = parseInt(highlight.endOffset);
+      const color = highlight.color || 'yellow';
+      const backgroundColor = {
+        'yellow': '#fff98033',
+        'green': '#86efac33',
+        'blue': '#93c5fd33',
+        'pink': '#f9a8d433',
+        'purple': '#d8b4fe33'
+      }[color] || '#fff98033';
 
       content = content.slice(0, start) +
-        `<mark class="highlight" style="background-color: ${highlight.color}; opacity: 0.3; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</mark>` +
+        `<span class="highlight" style="background-color: ${backgroundColor}; padding: 0 1px; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
         content.slice(end);
     }
 

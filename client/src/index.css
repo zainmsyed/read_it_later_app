@@ -29,6 +29,16 @@
 
 .newspaper-title {
   @apply text-center mb-8;
+
+.highlight {
+  border-radius: 2px;
+  transition: background-color 0.2s ease;
+}
+
+.highlight:hover {
+  filter: brightness(1.2);
+}
+
   font-family: "EB Garamond", Georgia, serif;
   font-size: 5.625rem;
   letter-spacing: -1px;
