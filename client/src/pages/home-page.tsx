@@ -182,7 +182,7 @@ export default function HomePage() {
                   size="sm"
                 >
                   <Plus className="h-6 w-6" />
-                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-muted-foreground/70">Add Article</span>}
+                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-foreground">Add Article</span>}
                 </Button>
               </DialogTrigger>
               <DialogContent>
