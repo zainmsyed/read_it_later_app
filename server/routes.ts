@@ -16,12 +16,12 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.jpg', '.jpeg', '.png', '.pdf'];
+    const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPG, PNG and PDF files are allowed.'));
+      cb(new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`));
     }
   }
 });
