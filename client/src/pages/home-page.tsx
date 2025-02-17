@@ -609,5 +609,7 @@ export default function HomePage() {
       </Dialog>
       <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
+  </div>
   );
+}
 }
