@@ -360,7 +360,7 @@ export default function ReadPage() {
           </TooltipTrigger>
           <TooltipContent side="bottom">Back to Home</TooltipContent>
         </Tooltip>
-        <div className="flex-1 flex items-center gap-4 mx-4">
+        <div className="flex-1 flex items-center mx-4">
           <div className="flex flex-wrap gap-2">
             {article.tags?.map((tag) => (
               <Badge key={tag} variant="secondary" className="bg-background/40 text-muted-foreground">
@@ -368,6 +368,8 @@ export default function ReadPage() {
               </Badge>
             ))}
           </div>
+        </div>
+        <div className="flex items-center gap-4">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -383,9 +385,6 @@ export default function ReadPage() {
               <TooltipContent side="bottom">Edit Tags</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 mr-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
