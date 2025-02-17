@@ -16,7 +16,7 @@ import { useState } from "react";
 import { SearchCommandPalette } from "@/components/ui/search-command";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
 export default function HomePage() {
