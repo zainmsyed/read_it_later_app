@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 .black-header-bar {
-  @apply w-full h-8 bg-black dark:bg-white mt-4;
+  @apply max-w-6xl mx-auto h-8 bg-black dark:bg-white mt-4;
 }
 
 @layer base {
