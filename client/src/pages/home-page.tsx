@@ -203,9 +203,17 @@ export default function HomePage() {
           )}
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
-              <SearchIcon className="h-5 w-5" />
-            </Button>
+            <div className="flex-1 max-w-2xl">
+              <div className="relative">
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search articles..."
+                  className="w-full pl-9"
+                  onClick={() => setSearchOpen(true)}
+                  readOnly
+                />
+              </div>
+            </div>
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
