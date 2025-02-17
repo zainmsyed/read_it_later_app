@@ -160,12 +160,12 @@ export default function HomePage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Link href="/settings">
+                <Link href="/settings">
+                  <DropdownMenuItem>
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
-                  </Link>
-                </DropdownMenuItem>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
                   <LogOut className="h-4 w-4 mr-2" />
@@ -181,7 +181,7 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-wrap gap-4 items-center justify-center">
-
+          
 
           <div className="flex items-center gap-2">
             <div className="flex-1 max-w-2xl">
@@ -258,26 +258,22 @@ export default function HomePage() {
                         ))}
                       </div>
                     )}
-                    <div className="space-y-2 mt-4">
-                      <p className="text-sm text-muted-foreground">Existing tags:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {existingTags
-                          .filter(tag => !form.getValues("tags").includes(tag))
-                          .map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className="cursor-pointer hover:bg-muted"
-                              onClick={() => {
-                                const currentTags = form.getValues("tags");
-                                if (!currentTags.includes(tag)) {
-                                  form.setValue("tags", [...currentTags, tag]);
-                                }
-                              }}
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
+                    {existingTags.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Existing tags:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {existingTags
+                            .filter(tag => !form.getValues("tags").includes(tag))
+                            .map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="outline"
+                                className="cursor-pointer hover:bg-muted"
+                                onClick={() => addExistingTag(tag)}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
                         </div>
                       </div>
                     )}
@@ -302,7 +298,7 @@ export default function HomePage() {
 
           </div>
         </div>
-
+        
         {existingTags.length > 0 && (
           <div className="flex flex-wrap gap-2 items-center justify-center mt-4">
             <span className="text-sm font-semibold">Tags:</span>
@@ -493,20 +489,14 @@ export default function HomePage() {
                   {existingTags
                     .filter(tag => !pendingTags.includes(tag))
                     .map((tag) => (
-                      <button
+                      <Badge
                         key={tag}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPendingTags([...pendingTags, tag])
-                        }}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-muted"
+                        onClick={() => setPendingTags([...pendingTags, tag])}
                       >
-                        <Badge
-                          variant="outline"
-                          className="cursor-pointer hover:bg-muted"
-                        >
-                          {tag}
-                        </Badge>
-                      </button>
+                        {tag}
+                      </Badge>
                     ))}
                 </div>
               </div>
