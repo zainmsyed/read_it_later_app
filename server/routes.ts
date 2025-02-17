@@ -403,8 +403,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     try {
-      const filename = await storage.uploadFile(req.user.id, req.file);
-      const url = storage.getFileUrl(req.user.id, filename);
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = './uploads';
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const ext = path.extname(req.file.originalname);
+      const filename = `${req.user.id}-${Date.now()}${ext}`;
+      const filepath = path.join(uploadsDir, filename);
+      
+      await fs.promises.writeFile(filepath, req.file.buffer);
+      const url = `/uploads/${filename}`;
+      
       res.json({ url });
     } catch (error) {
       console.error("Error uploading file:", error);
