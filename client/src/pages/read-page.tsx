@@ -5,6 +5,12 @@ import { cn } from "@/lib/utils";
 import { Article, Highlight } from "@shared/schema";
 import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ArrowLeft, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, BookOpenText } from "lucide-react";
