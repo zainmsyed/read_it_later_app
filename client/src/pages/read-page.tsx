@@ -433,7 +433,7 @@ export default function ReadPage() {
                   }}
                   className="text-muted-foreground hover:text-destructive"
                 >
-                  <X className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">Delete Article</TooltipContent>
