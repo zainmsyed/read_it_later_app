@@ -156,7 +156,7 @@ export default function HomePage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-10 w-10" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
