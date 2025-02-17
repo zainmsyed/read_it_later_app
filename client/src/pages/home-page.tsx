@@ -151,12 +151,12 @@ export default function HomePage() {
           isSidebarCollapsed ? 'w-16' : 'w-64'
         }`}
       >
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-8">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-10">
             {!isSidebarCollapsed && (
-              <div className="flex items-center gap-2">
-                <BookOpenText className="h-6 w-6" />
-                <h1 className="text-xl font-semibold">Postea</h1>
+              <div className="flex items-center gap-3">
+                <BookOpenText className="h-5 w-5" />
+                <h1 className="text-lg font-medium tracking-tight">Postea</h1>
               </div>
             )}
             <Button
