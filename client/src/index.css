@@ -145,20 +145,8 @@
   margin: 1.5rem 0;
   border-collapse: collapse;
   border: 1px solid hsl(var(--border));
-  display: table;
-  table-layout: fixed;
-}
-
-.markdown-content thead {
-  display: table-header-group;
-}
-
-.markdown-content tbody {
-  display: table-row-group;
-}
-
-.markdown-content tr {
-  display: table-row;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 
 .markdown-content th {
@@ -167,14 +155,21 @@
   padding: 0.75rem;
   border: 1px solid hsl(var(--border));
   background-color: hsl(var(--muted));
-  display: table-cell;
+  white-space: nowrap;
 }
 
 .markdown-content td {
   padding: 0.75rem;
   border: 1px solid hsl(var(--border));
-  display: table-cell;
-  word-wrap: break-word;
+}
+
+.markdown-content td a {
+  color: hsl(var(--primary));
+  text-decoration: none;
+}
+
+.markdown-content td a:hover {
+  text-decoration: underline;
 }
 
 .markdown-content tr:hover {
