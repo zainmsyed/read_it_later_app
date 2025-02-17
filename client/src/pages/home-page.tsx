@@ -126,7 +126,7 @@ export default function HomePage() {
           throw new Error(uploadData.message || 'Failed to upload file');
         }
         
-        const { url: fileUrl } = await uploadRes.json();
+        const { url: fileUrl } = uploadData;
         
         // Then create article with the file URL
         const res = await fetch('/api/articles', {
