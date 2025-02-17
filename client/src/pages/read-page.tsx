@@ -901,7 +901,7 @@ const createHighlightMutation = useMutation({
 
             {(highlights.length > 0 || article.notes) && (
               <Button
-                className={`fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg transition-opacity duration-200 ease-in-out opacity-100 hover:opacity-100`}
+                className="fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg"
                 size="lg"
                 variant="secondary"
                 onClick={() => {
@@ -931,6 +931,7 @@ const createHighlightMutation = useMutation({
                   {article.notes}
                 </ReactMarkdown>
               </div>
+            </div>
             </div>
           )}
         </main>
