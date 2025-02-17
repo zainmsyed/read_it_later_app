@@ -402,37 +402,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) return res.sendStatus(401);
     
     try {
-        if (err instanceof multer.MulterError) {
-          return res.status(400).json({ message: err.message });
-        } else if (err) {
-          return res.status(400).json({ message: err.message });
-        }
-        
-        if (!req.file) {
-          return res.status(400).json({ message: "No file uploaded" });
-        }
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
 
-        const uploadsDir = path.join(process.cwd(), 'uploads');
-        await fs.promises.mkdir(uploadsDir, { recursive: true });
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      await fs.promises.mkdir(uploadsDir, { recursive: true });
 
-        const ext = path.extname(req.file.originalname).toLowerCase();
-        const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
-        
-        if (!allowedTypes.includes(ext)) {
-          return res.status(400).json({ 
-            message: `Invalid file type. Allowed types: ${allowedTypes.join(', ')}` 
-          });
-        }
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
+      
+      if (!allowedTypes.includes(ext)) {
+        return res.status(400).json({ 
+          message: `Invalid file type. Allowed types: ${allowedTypes.join(', ')}` 
+        });
+      }
 
-        const filename = `${req.user.id}-${Date.now()}${ext}`;
-        const filepath = path.join(uploadsDir, filename);
-        
-        await fs.promises.writeFile(filepath, req.file.buffer);
-        const url = `/uploads/${filename}`;
-        
-        res.json({ url });
-      });
+      const filename = `${req.user.id}-${Date.now()}${ext}`;
+      const filepath = path.join(uploadsDir, filename);
+      
+      await fs.promises.writeFile(filepath, req.file.buffer);
+      const url = `/uploads/${filename}`;
+      
+      res.json({ url });
     } catch (error) {
+      if (error instanceof multer.MulterError) {
+        return res.status(400).json({ message: error.message });
+      }
       console.error("Error uploading file:", error);
       res.status(500).json({ message: "Failed to upload file" });
     }
