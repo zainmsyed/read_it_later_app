@@ -472,7 +472,12 @@ export default function HomePage() {
                       )}
                     </Link>
                     <div className="flex gap-2">
-
+                      {/* Added read status indicator */}
+                      {article.isRead && (
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
