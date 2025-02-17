@@ -294,27 +294,16 @@ const createHighlightMutation = useMutation({
     }
 
     let content = article.content;
-    if (highlights.length > 0) {
-      const sortedHighlights = [...highlights].sort((a, b) =>
-        parseInt(b.startOffset) - parseInt(a.startOffset)
-      );
+    const sortedHighlights = [...highlights].sort((a, b) => 
+      parseInt(a.startOffset) - parseInt(b.startOffset)
+    );
 
-      for (const highlight of sortedHighlights) {
-        const start = parseInt(highlight.startOffset);
-        const end = parseInt(highlight.endOffset);
-        const color = highlight.color || 'yellow';
-        const backgroundColor = {
-          'yellow': '#ffeb3b',
-          'green': '#4caf50',
-          'blue': '#2196f3',
-          'pink': '#e91e63',
-          'purple': '#9c27b0'
-        }[color] || '#ffeb3b';
-
-        content = content.slice(0, start) +
-          `<mark class="highlight" style="background-color: ${backgroundColor}; opacity: 0.3; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</mark>` +
+    for (const highlight of sortedHighlights) {
+      const start = parseInt(highlight.startOffset);
+      const end = parseInt(highlight.endOffset);
+      content = content.slice(0, start) +
+        `<span class="highlight-text" style="background-color: ${highlight.color}; display: inline;">${content.slice(start, end)}</span>` +
         content.slice(end);
-      }
     }
 
     return content;
