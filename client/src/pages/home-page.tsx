@@ -243,13 +243,18 @@ export default function HomePage() {
                       </div>
                       {form.getValues("tags").length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-4">
-                          {form.getValues("tags").map((tag) => (
+                          {form.watch("tags", []).map((tag) => (
                             <Badge key={tag} className="gap-1">
                               {tag}
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  removeTag(tag);
+                                  const currentTags = form.getValues("tags");
+                                  form.setValue(
+                                    "tags",
+                                    currentTags.filter((t) => t !== tag),
+                                    { shouldValidate: true }
+                                  );
                                 }}
                                 className="hover:text-destructive"
                               >
