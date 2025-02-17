@@ -144,30 +144,14 @@ export default function HomePage() {
           credentials: 'include'
         });
 
+        const responseData = await res.json();
         if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.message || 'Failed to create article');
+          throw new Error(responseData.message || 'Failed to create article');
         }
-
-        return res.json();
+        return responseData;
       } else {
         const res = await fetch('/api/articles', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            url: data.url.trim(),
-            tags: data.tags
-          }),
-          credentials: 'include'
-        });
-        const responseData = await res.json();
-        if (!res.ok) {
-          throw new Error(responseData.message || "Failed to save article");
-        }
-        return responseData;
-      }
           headers: {
             'Content-Type': 'application/json',
           },
