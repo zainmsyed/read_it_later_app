@@ -45,7 +45,6 @@ export default function HomePage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [selectedView, setSelectedView] = useState("readingList"); // Add state for view selection
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -136,10 +135,6 @@ export default function HomePage() {
     if (selectedTags.length === 0) return true;
     return selectedTags.every(tag => article.tags?.includes(tag));
   });
-
-  const readingListArticles = filteredArticles?.filter(article => !article.read);
-  const readArticles = filteredArticles?.filter(article => article.read);
-
 
   if (isLoading || isArchivedLoading) {
     return (
@@ -302,25 +297,17 @@ export default function HomePage() {
               </DialogContent>
             </Dialog>
 
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} ${selectedView === "readingList" ? "bg-primary/90 hover:bg-primary shadow-sm transition-all duration-200" : ""}`} 
-              size="sm"
-              onClick={() => setSelectedView("readingList")}
-            >
-              <BookOpenText className="h-4 w-4" />
-              {!isSidebarCollapsed && <span className="ml-2">Reading List</span>}
-            </Button>
+            <Link href="/">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                size="sm"
+              >
+                <BookOpenText className="h-4 w-4" />
+                {!isSidebarCollapsed && <span className="ml-2">Reading List</span>}
+              </Button>
+            </Link>
 
-            <Button 
-              variant="ghost" 
-              className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} ${selectedView === "read" ? "bg-primary/90 hover:bg-primary shadow-sm transition-all duration-200" : ""}`} 
-              size="sm"
-              onClick={() => setSelectedView("read")}
-            >
-              <Check className="h-4 w-4" />
-              {!isSidebarCollapsed && <span className="ml-2">Already Read</span>}
-            </Button>
 
 
             {existingTags.length > 0 && !isSidebarCollapsed && (
@@ -373,7 +360,7 @@ export default function HomePage() {
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : (selectedView === "readingList" ? 'Reading List' : 'Already Read')}</h2>
+            <h2 className="text-2xl font-semibold">{selectedTags.length > 0 ? 'Filtered Articles' : 'Reading List'}</h2>
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -426,99 +413,17 @@ export default function HomePage() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-border" />
             </div>
-          ) : (selectedView === "readingList" ? (readingListArticles?.length === 0 ? (
+          ) : filteredArticles?.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>
-                No articles saved yet. Click 'Add Article' to get started.
+                {selectedTags.length > 0
+                  ? "No articles found with the selected tags."
+                  : "No articles saved yet. Click 'Add Article' to get started."}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {readingListArticles?.map((article) => (
-                <Card key={article.id} className="hover:bg-muted/50 transition-colors">
-                  <CardContent className="p-6 flex justify-between items-start">
-                    <Link href={`/read/${article.id}`} className="flex-1">
-                      <CardTitle className="mb-2 hover:text-primary">{article.title}</CardTitle>
-                      {article.description && (
-                        <p className="text-muted-foreground text-sm line-clamp-2 mb-2">
-                          {article.description}
-                        </p>
-                      )}
-                      {article.tags && article.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {article.tags?.map((tag) => (
-                            <Badge 
-                              key={tag} 
-                              className="tag-badge group cursor-pointer hover:bg-destructive/10"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                if (confirm(`Remove tag "${tag}"?`)) {
-                                  const updatedTags = article.tags?.filter(t => t !== tag);
-                                  updateArticleMutation.mutate(
-                                    { id: article.id, data: { tags: updatedTags } }
-                                  );
-                                }
-                              }}
-                            >
-                              {tag}
-                              <X className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100" />
-                            </Badge>
-                          ))}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setEditingArticle(article);
-                              setPendingTags(article.tags || []);
-                              setIsEditingTags(true);
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </Link>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-destructive"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                            deleteArticleMutation.mutate(article.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          updateArticleMutation.mutate({ id: article.id, data: { read: true } });
-                        }}
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )) : (readArticles?.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No articles marked as read yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {readArticles?.map((article) => (
+              {filteredArticles?.map((article) => (
                 <Card key={article.id} className="hover:bg-muted/50 transition-colors">
                   <CardContent className="p-6 flex justify-between items-start">
                     <Link href={`/read/${article.id}`} className="flex-1">
@@ -586,8 +491,7 @@ export default function HomePage() {
                 </Card>
               ))}
             </div>
-          ))}
-          )
+          )}
         </div>
       </div>
     {/* Tag Editing Dialog */}
