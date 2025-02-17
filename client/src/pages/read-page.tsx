@@ -95,9 +95,15 @@ export default function ReadPage() {
     },
   });
 
-  const createHighlightMutation = useMutation({
+  const [selectedHighlightId, setSelectedHighlightId] = useState<number | null>(null);
+
+const createHighlightMutation = useMutation({
     mutationFn: async (data: { text: string; startOffset: string; endOffset: string; color?: string; note?: string }) => {
-      await apiRequest("POST", `/api/articles/${params?.id}/highlights`, data);
+      if (selectedHighlightId) {
+        await apiRequest("PATCH", `/api/highlights/${selectedHighlightId}`, data);
+      } else {
+        await apiRequest("POST", `/api/articles/${params?.id}/highlights`, data);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/articles/${params?.id}/highlights`] });
@@ -106,6 +112,7 @@ export default function ReadPage() {
       setSelectedText("");
       setHighlightColor("yellow");
       setHighlightNote("");
+      setSelectedHighlightId(null);
     },
   });
 
@@ -688,6 +695,7 @@ export default function ReadPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {
+                            setSelectedHighlightId(highlight.id);
                             setSelectedText(highlight.text);
                             setHighlightNote(highlight.note || '');
                             setHighlightColor(highlight.color || 'yellow');
