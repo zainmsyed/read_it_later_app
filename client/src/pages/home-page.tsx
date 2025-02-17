@@ -219,16 +219,17 @@ export default function HomePage() {
               <BookOpenText className="h-8 w-8" />
               <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
             </div>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2 w-full">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setSearchOpen(true)}
-                >
-                  <SearchIcon className="h-4 w-4" />
-                </Button>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <div className="flex items-center justify-center gap-2 w-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <SearchIcon className="h-4 w-4" />
+                <span>Search</span>
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
                       variant="ghost"
