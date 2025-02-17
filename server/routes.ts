@@ -6,6 +6,25 @@ import { insertArticleSchema } from "@shared/schema";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import { insertHighlightSchema } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.pdf'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPG, PNG and PDF files are allowed.'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -378,6 +397,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update highlight" });
     }
   });
+
+  app.post("/api/upload", upload.single('file'), async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+    try {
+      const filename = await storage.uploadFile(req.user.id, req.file);
+      const url = storage.getFileUrl(req.user.id, filename);
+      res.json({ url });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+
+  // Serve uploaded files
+  app.use('/uploads', express.static('uploads'));
 
   app.delete("/api/highlights/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);
