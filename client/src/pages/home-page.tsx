@@ -587,6 +587,7 @@ export default function HomePage() {
               ))}
             </div>
           ))}
+          )
         </div>
       </div>
     {/* Tag Editing Dialog */}
