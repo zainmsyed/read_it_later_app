@@ -154,129 +154,6 @@ export default function HomePage() {
         <div className="p-8">
 
           <div className="space-y-4">
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="ghost"
-                  className="w-full flex items-center justify-start bg-green-500/30 hover:bg-green-500/40 text-green-700 dark:text-green-300 font-medium" 
-                  size="sm"
-                >
-                  <Plus className="h-6 w-6" />
-                  <span className="ml-3 font-medium text-foreground">Add Article</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Article</DialogTitle>
-                </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="url"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>URL</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="https://..." disabled={addArticleMutation.isPending} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="tags"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>Tags</FormLabel>
-                          <FormControl>
-                            <div className="space-y-4">
-                              <div className="flex gap-2">
-                                <Input
-                                  value={currentTag}
-                                  onChange={(e) => setCurrentTag(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                      e.preventDefault();
-                                      addTag();
-                                    }
-                                  }}
-                                  placeholder="Add tags..."
-                                  disabled={addArticleMutation.isPending}
-                                />
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={addTag}
-                                  disabled={addArticleMutation.isPending}
-                                >
-                                  <Tag className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              {form.watch("tags").length > 0 && (
-                                <div className="flex flex-wrap gap-2">
-                                  {form.watch("tags").map((tag) => (
-                                    <Badge key={tag} className="tag-badge gap-1">
-                                      {tag}
-                                      <button
-                                        type="button"
-                                        onClick={() => removeTag(tag)}
-                                        className="hover:text-destructive"
-                                        disabled={addArticleMutation.isPending}
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </button>
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              {existingTags.length > 0 && (
-                                <div className="space-y-2">
-                                  <p className="text-sm text-muted-foreground">Existing tags:</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {existingTags
-                                      .filter(tag => !form.watch("tags").includes(tag))
-                                      .map((tag) => (
-                                        <Badge
-                                          key={tag}
-                                          variant="outline"
-                                          className="cursor-pointer hover:bg-muted"
-                                          onClick={() => addExistingTag(tag)}
-                                        >
-                                          {tag}
-                                        </Badge>
-                                      ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={addArticleMutation.isPending}
-                    >
-                      {addArticleMutation.isPending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        'Save Article'
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-
             <Link href="/">
               <Button 
                 variant="ghost" 
@@ -334,7 +211,7 @@ export default function HomePage() {
       </div>
 
       <div 
-        className={`flex-1 p-8 transition-all duration-300 ease-in-out ml-64`}
+        className={`flex-1 p-8 transition-all duration-300 ease-in-out ml-0`}
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col items-center gap-4 mb-8">
@@ -343,16 +220,136 @@ export default function HomePage() {
               <h1 className="text-3xl font-bold tracking-tight">Postea</h1>
             </div>
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4 w-full">
+              <div className="flex items-center gap-2 w-full">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full flex justify-start gap-2"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSearchOpen(true)}
                 >
                   <SearchIcon className="h-4 w-4" />
-                  <span className="text-muted-foreground">Search articles...</span>
                 </Button>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="ghost"
+                      className="flex items-center gap-2 bg-green-500/30 hover:bg-green-500/40 text-green-700 dark:text-green-300 font-medium"
+                      size="sm"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>Add Article</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Article</DialogTitle>
+                    </DialogHeader>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
+                        <FormField
+                          control={form.control}
+                          name="url"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>URL</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="https://..." disabled={addArticleMutation.isPending} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="tags"
+                          render={() => (
+                            <FormItem>
+                              <FormLabel>Tags</FormLabel>
+                              <FormControl>
+                                <div className="space-y-4">
+                                  <div className="flex gap-2">
+                                    <Input
+                                      value={currentTag}
+                                      onChange={(e) => setCurrentTag(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          addTag();
+                                        }
+                                      }}
+                                      placeholder="Add tags..."
+                                      disabled={addArticleMutation.isPending}
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={addTag}
+                                      disabled={addArticleMutation.isPending}
+                                    >
+                                      <Tag className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  {form.watch("tags").length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                      {form.watch("tags").map((tag) => (
+                                        <Badge key={tag} className="tag-badge gap-1">
+                                          {tag}
+                                          <button
+                                            type="button"
+                                            onClick={() => removeTag(tag)}
+                                            className="hover:text-destructive"
+                                            disabled={addArticleMutation.isPending}
+                                          >
+                                            <X className="h-3 w-3" />
+                                          </button>
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                  {existingTags.length > 0 && (
+                                    <div className="space-y-2">
+                                      <p className="text-sm text-muted-foreground">Existing tags:</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {existingTags
+                                          .filter(tag => !form.watch("tags").includes(tag))
+                                          .map((tag) => (
+                                            <Badge
+                                              key={tag}
+                                              variant="outline"
+                                              className="cursor-pointer hover:bg-muted"
+                                              onClick={() => addExistingTag(tag)}
+                                            >
+                                              {tag}
+                                            </Badge>
+                                          ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          disabled={addArticleMutation.isPending}
+                        >
+                          {addArticleMutation.isPending ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            'Save Article'
+                          )}
+                        </Button>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
                 <Button
                   variant="outline"
                   size="sm"
@@ -363,124 +360,125 @@ export default function HomePage() {
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
-          </div>
-          {selectedTags.length > 0 && (
-            <div className="flex-1 flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Filtered by:</span>
-              <div className="flex flex-wrap gap-2">
-                {selectedTags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="default"
-                    className="gap-1"
-                  >
-                    {tag}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        toggleTagFilter(tag);
-                      }}
-                      className="hover:text-destructive"
+            </div>
+            {selectedTags.length > 0 && (
+              <div className="flex-1 flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Filtered by:</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTags.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="default"
+                      className="gap-1"
                     >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
+                      {tag}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleTagFilter(tag);
+                        }}
+                        className="hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
+                  Clear All
+                </Button>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedTags([])}>
-                Clear All
-              </Button>
-            </div>
-          )}
+            )}
 
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-border" />
-            </div>
-          ) : filteredArticles?.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>
-                {selectedTags.length > 0
-                  ? "No articles found with the selected tags."
-                  : "No articles saved yet. Click 'Add Article' to get started."}
-              </p>
-            </div>
-          ) : (
-            <div className="article-grid">
-              {filteredArticles?.map((article) => (
-                <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
-                  <CardContent className="p-6 flex justify-between items-start">
-                    <Link href={`/read/${article.id}`} className="flex-1">
-                      <CardTitle className="mb-3 hover:text-primary article-title">{article.title}</CardTitle>
-                      {article.description && (
-                        <p className="article-description line-clamp-2 mb-4">
-                          {article.description}
-                        </p>
-                      )}
-                      {article.tags && article.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {article.tags?.map((tag) => (
-                            <Badge 
-                              key={tag} 
-                              className="tag-badge group cursor-pointer hover:bg-destructive/10"
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-border" />
+              </div>
+            ) : filteredArticles?.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>
+                  {selectedTags.length > 0
+                    ? "No articles found with the selected tags."
+                    : "No articles saved yet. Click 'Add Article' to get started."}
+                </p>
+              </div>
+            ) : (
+              <div className="article-grid">
+                {filteredArticles?.map((article) => (
+                  <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
+                    <CardContent className="p-6 flex justify-between items-start">
+                      <Link href={`/read/${article.id}`} className="flex-1">
+                        <CardTitle className="mb-3 hover:text-primary article-title">{article.title}</CardTitle>
+                        {article.description && (
+                          <p className="article-description line-clamp-2 mb-4">
+                            {article.description}
+                          </p>
+                        )}
+                        {article.tags && article.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {article.tags?.map((tag) => (
+                              <Badge 
+                                key={tag} 
+                                className="tag-badge group cursor-pointer hover:bg-destructive/10"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (confirm(`Remove tag "${tag}"?`)) {
+                                    const updatedTags = article.tags?.filter(t => t !== tag);
+                                    updateArticleMutation.mutate(
+                                      { id: article.id, data: { tags: updatedTags } }
+                                    );
+                                  }
+                                }}
+                              >
+                                {tag}
+                                <X className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100" />
+                              </Badge>
+                            ))}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2"
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                if (confirm(`Remove tag "${tag}"?`)) {
-                                  const updatedTags = article.tags?.filter(t => t !== tag);
-                                  updateArticleMutation.mutate(
-                                    { id: article.id, data: { tags: updatedTags } }
-                                  );
-                                }
+                                setEditingArticle(article);
+                                setPendingTags(article.tags || []);
+                                setIsEditingTags(true);
                               }}
                             >
-                              {tag}
-                              <X className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100" />
-                            </Badge>
-                          ))}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 px-2"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setEditingArticle(article);
-                              setPendingTags(article.tags || []);
-                              setIsEditingTags(true);
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </Link>
-                    <div className="flex items-center gap-2">
-                      {/* Added read status indicator */}
-                      {article.read && (
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 border border-green-500">
-                          <Check className="h-4 w-4 text-green-500" />
-                        </div>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground hover:text-destructive"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                            deleteArticleMutation.mutate(article.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        {/* Added read status indicator */}
+                        {article.read && (
+                          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 border border-green-500">
+                            <Check className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-muted-foreground hover:text-destructive"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                              deleteArticleMutation.mutate(article.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {/* Tag Editing Dialog */}
@@ -593,7 +591,6 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
       <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-    </div>
     </div>
   );
 }
