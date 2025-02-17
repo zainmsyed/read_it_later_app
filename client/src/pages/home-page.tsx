@@ -241,7 +241,7 @@ export default function HomePage() {
                       </Button>
                     </div>
                     {form.getValues("tags").length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {form.getValues("tags").map((tag) => (
                           <Badge key={tag} className="gap-1">
                             {tag}
@@ -258,10 +258,23 @@ export default function HomePage() {
                         ))}
                       </div>
                     )}
-                    {existingTags.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Existing tags:</p>
-                        <div className="flex flex-wrap gap-2">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Available tags:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {existingTags
+                          .filter(tag => !form.getValues("tags").includes(tag))
+                          .map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="cursor-pointer hover:bg-muted"
+                              onClick={() => addExistingTag(tag)}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>-2">
                           {existingTags
                             .filter(tag => !form.getValues("tags").includes(tag))
                             .map((tag) => (
