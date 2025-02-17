@@ -235,7 +235,10 @@ export default function HomePage() {
                                 key={tag}
                                 variant="outline"
                                 className="cursor-pointer hover:bg-muted"
-                                onClick={() => addExistingTag(tag)}
+                                onClick={() => {
+                                  const currentTags = form.getValues("tags");
+                                  form.setValue("tags", [...currentTags, tag], { shouldDirty: true });
+                                }}
                               >
                                 {tag}
                               </Badge>
