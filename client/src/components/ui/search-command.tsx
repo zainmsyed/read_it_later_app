@@ -145,7 +145,7 @@ export function SearchCommandPalette({
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <Command className="rounded-lg border shadow-md">
+      <Command className="rounded-lg border shadow-md w-[90vw] max-w-3xl">
         <div className="flex items-center gap-2 p-2 w-full">
           <CommandInput
             className="flex-1"
