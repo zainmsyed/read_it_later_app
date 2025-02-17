@@ -182,7 +182,6 @@ export default function HomePage() {
           <Link href="/">
             <Button variant="ghost" className="flex items-center gap-2">
               <BookOpenText className="h-5 w-5" />
-              <span>Reading List</span>
             </Button>
           </Link>
 
