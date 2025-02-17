@@ -334,8 +334,8 @@ export default function HomePage() {
                       </div>
                     )}
                     {article.notes && (
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500">
-                        <StickyNote className="h-4 w-4 text-blue-500" />
+                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-black/10 dark:bg-white/10 border border-black dark:border-white">
+                        <StickyNote className="h-4 w-4 text-black dark:text-white" />
                       </div>
                     )}
                     <Button
