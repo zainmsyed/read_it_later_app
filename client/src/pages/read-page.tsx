@@ -345,9 +345,16 @@ export default function ReadPage() {
   return (
     <div className="min-h-screen">
       <header className="fixed top-0 left-0 right-0 h-12 bg-background/60 backdrop-blur-md border-b border-border/50 flex items-center px-4 z-10 transition-all duration-200 hover:bg-background/80">
-        <Button variant="ghost" size="icon" onClick={() => setLocation("/")} className="text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={() => setLocation("/")} className="text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Back to Home</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <div className="flex-1 flex items-center gap-4 mx-4">
           <div className="flex flex-wrap gap-2">
             {article.tags?.map((tag) => (
@@ -356,49 +363,77 @@ export default function ReadPage() {
               </Badge>
             ))}
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={startEditing}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <Tag className="h-4 w-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={startEditing}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Tag className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Edit Tags</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 mr-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              className={cn(
-                "text-muted-foreground hover:text-foreground",
-                article.read && "text-foreground"
-              )}
-              onClick={() => updateArticleMutation.mutate({ read: !article.read })}
-            >
-              <Check className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <BookOpenText className="h-4 w-4" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className={cn(
+                      "text-muted-foreground hover:text-foreground",
+                      article.read && "text-foreground"
+                    )}
+                    onClick={() => updateArticleMutation.mutate({ read: !article.read })}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Mark as {article.read ? 'Unread' : 'Read'}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <BookOpenText className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Export Notes</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
-                deleteArticleMutation.mutate();
-              }
-            }}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
+                      deleteArticleMutation.mutate();
+                    }
+                  }}
+                  className="text-muted-foreground hover:text-destructive"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Delete Article</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
 
