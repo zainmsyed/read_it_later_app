@@ -750,6 +750,15 @@ export default function ReadPage() {
 
         <main className="max-w-[680px] mx-auto px-4 py-24">
           <article className="prose prose-lg dark:prose-invert prose-headings:font-serif prose-p:font-serif prose-p:leading-relaxed">
+                <a 
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer" 
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+                >
+                  <FileText className="h-4 w-4" />
+                  {article.url}
+                </a>
             {article.url.includes("youtube.com") && (
               <div className="mb-8 aspect-video">
                 <iframe
