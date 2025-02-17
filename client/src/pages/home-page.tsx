@@ -181,8 +181,8 @@ export default function HomePage() {
                   className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'} hover:bg-muted/50 transition-all duration-200 h-10`} 
                   size="sm"
                 >
-                  <Plus className="h-4 w-4 text-muted-foreground/70" />
-                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-muted-foreground/70">Add Article</span>}
+                  <Plus className="h-5 w-5 text-muted-foreground/70" />
+                  {!isSidebarCollapsed && <span className="ml-4 font-medium text-muted-foreground/70">Add Article</span>}
                 </Button>
               </DialogTrigger>
               <DialogContent>
