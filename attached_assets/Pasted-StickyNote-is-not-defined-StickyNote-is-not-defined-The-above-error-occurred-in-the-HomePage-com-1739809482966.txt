@@ -1,0 +1,25 @@
+StickyNote is not defined
+StickyNote is not defined
+The above error occurred in the <HomePage> component:
+
+    at HomePage (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/src/pages/home-page.tsx:38:33)
+    at ProtectedRoute (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/src/lib/protected-route.tsx:22:3)
+    at Switch (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=5fb1f3e9:247:17)
+    at Router
+    at AuthProvider (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=5fb1f3e9:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+StickyNote is not defined
+at https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/src/pages/home-page.tsx:538:201
+at Array.map (<anonymous>)
+at HomePage (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/src/pages/home-page.tsx:442:105)
+at renderWithHooks (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:11548:26)
+at updateFunctionComponent (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:14582:28)
+at beginWork (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:15924:22)
+at beginWork$1 (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:19753:22)
+at performUnitOfWork (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:19198:20)
+at workLoopSync (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:19137:13)
+at renderRootSync (https://4780db76-ffd7-4183-ac43-799da44419d4-00-6ixf06ks1ccc.spock.repl.co/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RPCDYKBN.js?v=5fb1f3e9:19116:15)
