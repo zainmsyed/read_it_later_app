@@ -155,8 +155,8 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-10">
             {!isSidebarCollapsed && (
               <div className="flex items-center gap-3">
-                <BookOpenText className="h-5 w-5" />
-                <h1 className="text-lg font-medium tracking-tight">Postea</h1>
+                <BookOpenText className="h-6 w-6" />
+                <h1 className="text-xl font-medium tracking-tight">Postea</h1>
               </div>
             )}
             <Button
@@ -303,8 +303,8 @@ export default function HomePage() {
                 className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                 size="sm"
               >
-                <BookOpenText className="h-4 w-4" />
-                {!isSidebarCollapsed && <span className="ml-2">Reading List</span>}
+                <BookOpenText className="h-6 w-6" />
+                {!isSidebarCollapsed && <span className="ml-3">Reading List</span>}
               </Button>
             </Link>
 
