@@ -202,20 +202,20 @@ export default function HomePage() {
             <div className="flex items-center justify-between w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50">
-                    <Menu className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="fixed top-4 right-4 z-50">
+                    <Menu className="h-6 w-6" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
+                <DropdownMenuContent className="w-64" align="end">
                   <Link href="/settings">
-                    <DropdownMenuItem>
-                      <Settings className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem className="py-3">
+                      <Settings className="h-5 w-5 mr-3" />
                       Settings
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
-                    <LogOut className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem className="py-3" onClick={() => logoutMutation.mutate()}>
+                    <LogOut className="h-5 w-5 mr-3" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
