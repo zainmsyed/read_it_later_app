@@ -343,10 +343,9 @@ export default function ReadPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="fixed top-0 left-0 right-0 h-16 bg-background/80 backdrop-blur-sm border-b border-border flex items-center px-4 z-10">
-        <Button variant="ghost" size="sm" onClick={() => setLocation("/")}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+      <header className="fixed top-0 left-0 right-0 h-12 bg-background/60 backdrop-blur-md border-b border-border/50 flex items-center px-4 z-10 transition-all duration-200 hover:bg-background/80">
+        <Button variant="ghost" size="icon" onClick={() => setLocation("/")} className="text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1 flex items-center gap-4 mx-4">
           <div className="flex flex-wrap gap-2">
