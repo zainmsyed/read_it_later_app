@@ -258,27 +258,26 @@ export default function HomePage() {
                         ))}
                       </div>
                     )}
-                    {existingTags.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Existing tags:</p>
-                        <div className="flex flex-wrap gap-2">
-                          {existingTags
-                            .filter(tag => !form.getValues("tags").includes(tag))
-                            .map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="outline"
-                                className="cursor-pointer hover:bg-muted"
-                                onClick={() => {
-                                  const currentTags = form.getValues("tags");
-                                  if (!currentTags.includes(tag)) {
-                                    form.setValue("tags", [...currentTags, tag]);
-                                  }
-                                }}
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
+                    <div className="space-y-2 mt-4">
+                      <p className="text-sm text-muted-foreground">Existing tags:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {existingTags
+                          .filter(tag => !form.getValues("tags").includes(tag))
+                          .map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="cursor-pointer hover:bg-muted"
+                              onClick={() => {
+                                const currentTags = form.getValues("tags");
+                                if (!currentTags.includes(tag)) {
+                                  form.setValue("tags", [...currentTags, tag]);
+                                }
+                              }}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
                     )}
