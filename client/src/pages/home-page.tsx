@@ -265,20 +265,19 @@ export default function HomePage() {
                           {existingTags
                             .filter(tag => !form.getValues("tags").includes(tag))
                             .map((tag) => (
-                              <button
+                              <Badge
                                 key={tag}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  addExistingTag(tag);
+                                variant="outline"
+                                className="cursor-pointer hover:bg-muted"
+                                onClick={() => {
+                                  const currentTags = form.getValues("tags");
+                                  if (!currentTags.includes(tag)) {
+                                    form.setValue("tags", [...currentTags, tag]);
+                                  }
                                 }}
                               >
-                                <Badge
-                                  variant="outline"
-                                  className="cursor-pointer hover:bg-muted"
-                                >
-                                  {tag}
-                                </Badge>
-                              </button>
+                                {tag}
+                              </Badge>
                             ))}
                         </div>
                       </div>
