@@ -179,11 +179,7 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-wrap gap-4 items-center justify-center">
-          <Link href="/">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <BookOpenText className="h-5 w-5" />
-            </Button>
-          </Link>
+          
 
           <div className="flex items-center gap-2">
             <div className="flex-1 max-w-2xl">
