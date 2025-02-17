@@ -303,7 +303,7 @@ export default function HomePage() {
                 className={`w-full justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
                 size="sm"
               >
-                <BookOpenText className="h-6 w-6" />
+                <BookOpenText className="h-4 w-4" />
                 {!isSidebarCollapsed && <span className="ml-3">Reading List</span>}
               </Button>
             </Link>
