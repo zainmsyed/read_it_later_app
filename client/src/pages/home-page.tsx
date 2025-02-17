@@ -45,6 +45,8 @@ export default function HomePage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
     queryKey: ["/api/articles"],
@@ -107,8 +109,20 @@ export default function HomePage() {
   };
 
   const addArticleMutation = useMutation({
-    mutationFn: async (data: { url: string; tags: string[] }) => {
-      const res = await apiRequest("POST", "/api/articles", data);
+    mutationFn: async (data: { url: string; tags: string[]; file: File | null }) => {
+      const formData = new FormData();
+      if (data.file) {
+        formData.append('file', data.file);
+      } else {
+        formData.append('url', data.url.trim());
+      }
+      data.tags.forEach(tag => formData.append('tags[]', tag));
+
+      const res = await fetch('/api/articles', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
       const responseData = await res.json();
       if (!res.ok) {
         throw new Error(responseData.message || "Failed to save article");
@@ -121,6 +135,8 @@ export default function HomePage() {
       toast({ title: "Article saved successfully" });
       form.reset();
       setDialogOpen(false);
+      setUrl('');
+      setFile(null);
     },
     onError: (error: Error) => {
       toast({
@@ -190,17 +206,33 @@ export default function HomePage() {
                   <DialogTitle>Add New Article</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
+                  <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate({...data, file}))} className="space-y-4">
                     <FormField
                       control={form.control}
                       name="url"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>URL</FormLabel>
+                          <FormLabel>URL or File</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="https://..." disabled={addArticleMutation.isPending} />
+                            <Input {...field} placeholder="https://..." disabled={!!file} />
                           </FormControl>
                           <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="file"
+                      render={({field}) => (
+                        <FormItem>
+                          <FormLabel>Or upload a file</FormLabel>
+                          <FormControl>
+                            <Input type="file" {...field} accept=".pdf,.txt,.md,.doc,.docx" onChange={(e) => {
+                              setFile(e.target.files?.[0] || null);
+                              if (e.target.files?.[0]) form.setValue('url', '');
+                            }} disabled={!!url}/>
+                          </FormControl>
+                          <FormMessage/>
                         </FormItem>
                       )}
                     />
