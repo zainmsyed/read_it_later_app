@@ -181,7 +181,7 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-wrap gap-4 items-center justify-center">
-          
+
 
           <div className="flex items-center gap-2">
             <div className="flex-1 max-w-2xl">
@@ -265,14 +265,20 @@ export default function HomePage() {
                           {existingTags
                             .filter(tag => !form.getValues("tags").includes(tag))
                             .map((tag) => (
-                              <Badge
+                              <button
                                 key={tag}
-                                variant="outline"
-                                className="cursor-pointer hover:bg-muted"
-                                onClick={() => addExistingTag(tag)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  addExistingTag(tag);
+                                }}
                               >
-                                {tag}
-                              </Badge>
+                                <Badge
+                                  variant="outline"
+                                  className="cursor-pointer hover:bg-muted"
+                                >
+                                  {tag}
+                                </Badge>
+                              </button>
                             ))}
                         </div>
                       </div>
@@ -298,7 +304,7 @@ export default function HomePage() {
 
           </div>
         </div>
-        
+
         {existingTags.length > 0 && (
           <div className="flex flex-wrap gap-2 items-center justify-center mt-4">
             <span className="text-sm font-semibold">Tags:</span>
@@ -489,14 +495,20 @@ export default function HomePage() {
                   {existingTags
                     .filter(tag => !pendingTags.includes(tag))
                     .map((tag) => (
-                      <Badge
+                      <button
                         key={tag}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-muted"
-                        onClick={() => setPendingTags([...pendingTags, tag])}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPendingTags([...pendingTags, tag])
+                        }}
                       >
-                        {tag}
-                      </Badge>
+                        <Badge
+                          variant="outline"
+                          className="cursor-pointer hover:bg-muted"
+                        >
+                          {tag}
+                        </Badge>
+                      </button>
                     ))}
                 </div>
               </div>
