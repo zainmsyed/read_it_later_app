@@ -204,6 +204,84 @@ export default function HomePage() {
                   <span>Add Article</span>
                 </Button>
               </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Article</DialogTitle>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit((data) => addArticleMutation.mutate(data))} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="url"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter URL" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex gap-2">
+                      <Input
+                        value={currentTag}
+                        onChange={(e) => setCurrentTag(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addTag();
+                          }
+                        }}
+                        placeholder="Add tags..."
+                      />
+                      <Button type="button" variant="outline" onClick={addTag}>
+                        <Tag className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {form.getValues("tags").length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {form.getValues("tags").map((tag) => (
+                          <Badge key={tag} className="gap-1">
+                            {tag}
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                removeTag(tag);
+                              }}
+                              className="hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    {existingTags.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Existing tags:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {existingTags
+                            .filter(tag => !form.getValues("tags").includes(tag))
+                            .map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="outline"
+                                className="cursor-pointer hover:bg-muted"
+                                onClick={() => addExistingTag(tag)}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                    <Button type="submit" className="w-full" disabled={addArticleMutation.isPending}>
+                      {addArticleMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Save Article
+                    </Button>
+                  </form>
+                </Form>
+              </DialogContent>
             </Dialog>
 
             <Button
