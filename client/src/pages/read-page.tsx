@@ -901,13 +901,7 @@ const createHighlightMutation = useMutation({
 
             {(highlights.length > 0 || article.notes) && (
               <Button
-                className={`fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg transition-opacity duration-200 ease-in-out ${isButtonVisible ? 'opacity-100' : 'opacity-0'} hover:opacity-100`}
-                onMouseEnter={() => setIsButtonVisible(true)}
-                onMouseLeave={() => {
-                  buttonTimeoutRef.current = setTimeout(() => {
-                    setIsButtonVisible(false);
-                  }, 1000);
-                }}
+                className={`fixed left-1/2 -translate-x-1/2 bottom-8 shadow-lg transition-opacity duration-200 ease-in-out opacity-100 hover:opacity-100`}
                 size="lg"
                 variant="secondary"
                 onClick={() => {
