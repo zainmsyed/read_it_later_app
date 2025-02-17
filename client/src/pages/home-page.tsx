@@ -43,7 +43,7 @@ export default function HomePage() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  
+
   const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
@@ -154,11 +154,11 @@ export default function HomePage() {
               <DialogTrigger asChild>
                 <Button 
                   variant="ghost"
-                  className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'} bg-green-500/30 hover:bg-green-500/40 text-green-700 dark:text-green-300 font-medium`} 
+                  className="w-full flex items-center justify-start bg-green-500/30 hover:bg-green-500/40 text-green-700 dark:text-green-300 font-medium" 
                   size="sm"
                 >
                   <Plus className="h-6 w-6" />
-                  {!isSidebarCollapsed && <span className="ml-3 font-medium text-foreground">Add Article</span>}
+                  <span className="ml-3 font-medium text-foreground">Add Article</span>
                 </Button>
               </DialogTrigger>
               <DialogContent>
@@ -276,17 +276,17 @@ export default function HomePage() {
             <Link href="/">
               <Button 
                 variant="ghost" 
-                className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                className="w-full flex items-center justify-start" 
                 size="sm"
               >
                 <BookOpenText className="h-6 w-6" />
-                {!isSidebarCollapsed && <span className="ml-3">Reading List</span>}
+                <span className="ml-3">Reading List</span>
               </Button>
             </Link>
 
 
 
-            {existingTags.length > 0 && !isSidebarCollapsed && (
+            {existingTags.length > 0 && (
               <div className="mt-6">
                 <h2 className="text-sm font-semibold mb-2">Filter by Tags</h2>
                 <div className="flex flex-wrap gap-2">
@@ -309,30 +309,28 @@ export default function HomePage() {
             <Link href="/settings">
               <Button 
                 variant="ghost" 
-                className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`} 
+                className="w-full flex items-center justify-start" 
                 size="sm"
               >
                 <Settings className="h-4 w-4" />
-                {!isSidebarCollapsed && <span className="ml-2">Settings</span>}
+                <span className="ml-2">Settings</span>
               </Button>
             </Link>
             <Button
               variant="ghost"
-              className={`w-full flex items-center justify-${isSidebarCollapsed ? 'center' : 'start'}`}
+              className="w-full flex items-center justify-start"
               size="sm"
               onClick={() => logoutMutation.mutate()}
             >
               <LogOut className="h-4 w-4" />
-              {!isSidebarCollapsed && <span className="ml-2">Logout</span>}
+              <span className="ml-2">Logout</span>
             </Button>
           </div>
         </div>
       </div>
 
       <div 
-        className={`flex-1 p-8 transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'ml-16' : 'ml-64'
-        }`}
+        className={`flex-1 p-8 transition-all duration-300 ease-in-out ml-64`}
       >
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col items-center gap-4 mb-8">
