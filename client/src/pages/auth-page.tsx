@@ -28,7 +28,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
+    <>
+      <div className="black-header-bar" />
+      <div className="min-h-screen flex items-center justify-center p-8">
       <Card className="w-[400px]">
         <CardContent className="p-6">
           <h1 className="newspaper-title text 4xl mb-8">Postea</h1>

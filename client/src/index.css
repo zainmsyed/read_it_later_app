@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.black-header-bar {
+  @apply w-full h-4 bg-black dark:bg-white;
+}
+
 @layer base {
   @font-face {
     font-family: 'Charter';
