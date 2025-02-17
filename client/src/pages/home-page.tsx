@@ -43,7 +43,7 @@ export default function HomePage() {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
   const [searchOpen, setSearchOpen] = useState(false);
 
   const { data: articles, isLoading } = useQuery<Article[]>({
@@ -146,26 +146,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex">
-      <div 
-        className={`fixed top-0 left-0 h-screen bg-muted border-r border-border overflow-y-auto transition-all duration-300 ease-in-out ${
-          isSidebarCollapsed ? 'w-16' : 'w-64'
-        }`}
-      >
-        <div className="p-6">
-          <div className="flex items-center justify-end mb-10">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="ml-auto"
-            >
-              {isSidebarCollapsed ? (
-                <PanelRightClose className="h-4 w-4" />
-              ) : (
-                <PanelLeftClose className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+      <div className="fixed top-0 left-0 h-screen w-64 bg-muted border-r border-border overflow-y-auto">
+        <div className="p-4">
 
           <div className="space-y-1">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
