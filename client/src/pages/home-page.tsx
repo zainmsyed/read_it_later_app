@@ -482,9 +482,8 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <>
-        {/* Tag Editing Dialog */}
-        <Dialog open={isEditingTags} onOpenChange={(open) => !open && setIsEditingTags(false)}>
+      {/* Tag Editing Dialog */}
+      <Dialog open={isEditingTags} onOpenChange={(open) => !open && setIsEditingTags(false)}>
         <DialogContent className="sm:max-w-[425px] gap-6">
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -593,7 +592,6 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
       <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
-      </>
     </div>
   );
 }
