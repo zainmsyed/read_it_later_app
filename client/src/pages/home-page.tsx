@@ -419,7 +419,7 @@ export default function HomePage() {
                     )}
                   </Link>
                   <div className="flex items-center justify-end gap-4">
-                    {article.notes && (
+                    {(article.notes || article.highlights?.length > 0) && (
                       <StickyNote className="h-4 w-4 text-black dark:text-white" />
                     )}
                     <Button
