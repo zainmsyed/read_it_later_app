@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
@@ -6,25 +6,6 @@ import { insertArticleSchema } from "@shared/schema";
 import { Readability } from "@mozilla/readability";
 import { JSDOM } from "jsdom";
 import { insertHighlightSchema } from "@shared/schema";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.includes(ext)) {
-      cb(null, true);
-    } else {
-      cb(new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`));
-    }
-  }
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -397,45 +378,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update highlight" });
     }
   });
-
-  app.post("/api/upload", upload.single('file'), async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-    
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
-      }
-
-      const uploadsDir = path.join(process.cwd(), 'uploads');
-      await fs.promises.mkdir(uploadsDir, { recursive: true });
-
-      const ext = path.extname(req.file.originalname).toLowerCase();
-      const allowedTypes = ['.pdf', '.txt', '.md', '.doc', '.docx'];
-      
-      if (!allowedTypes.includes(ext)) {
-        return res.status(400).json({ 
-          message: `Invalid file type. Allowed types: ${allowedTypes.join(', ')}` 
-        });
-      }
-
-      const filename = `${req.user.id}-${Date.now()}${ext}`;
-      const filepath = path.join(uploadsDir, filename);
-      
-      await fs.promises.writeFile(filepath, req.file.buffer);
-      const url = `/uploads/${filename}`;
-      
-      res.json({ url });
-    } catch (error) {
-      if (error instanceof multer.MulterError) {
-        return res.status(400).json({ message: error.message });
-      }
-      console.error("Error uploading file:", error);
-      res.status(500).json({ message: "Failed to upload file" });
-    }
-  });
-
-  // Serve uploaded files
-  app.use('/uploads', express.static('uploads'));
 
   app.delete("/api/highlights/:id", async (req, res) => {
     if (!req.user) return res.sendStatus(401);

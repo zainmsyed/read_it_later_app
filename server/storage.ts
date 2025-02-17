@@ -26,8 +26,6 @@ export interface IStorage {
   getPreferences(userId: number): Promise<Preferences>;
   updatePreferences(userId: number, prefs: Partial<InsertPreferences>): Promise<Preferences>;
 
-  uploadFile(userId: number, file: Express.Multer.File): Promise<string>;
-  getFileUrl(userId: number, filename: string): string;
   sessionStore: session.Store;
 }
 
@@ -165,22 +163,6 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!updated) throw new Error("Preferences not found");
     return updated;
-  }
-
-  async uploadFile(userId: number, file: Express.Multer.File): Promise<string> {
-    const uploadDir = './uploads';
-    await fs.promises.mkdir(uploadDir, { recursive: true });
-    
-    const ext = path.extname(file.originalname);
-    const filename = `${userId}-${Date.now()}${ext}`;
-    const filepath = path.join(uploadDir, filename);
-    
-    await fs.promises.writeFile(filepath, file.buffer);
-    return filename;
-  }
-
-  getFileUrl(userId: number, filename: string): string {
-    return `/uploads/${filename}`;
   }
 }
 
