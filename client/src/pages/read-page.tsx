@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, ArrowLeft, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, BookOpenText } from "lucide-react";
+import { Loader2, ArrowLeft, Tag, X, Check, StickyNote, Bold, Italic, List, ListOrdered, Quote, Highlighter, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -413,7 +413,7 @@ export default function ReadPage() {
                     onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    <BookOpenText className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Export Notes</TooltipContent>
