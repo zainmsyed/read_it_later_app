@@ -160,6 +160,19 @@ export default function HomePage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Link href="/settings">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
                 <Link href="/settings">
                   <DropdownMenuItem>
                     <Settings className="h-4 w-4 mr-2" />
