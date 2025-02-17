@@ -289,20 +289,22 @@ const createHighlightMutation = useMutation({
   };
 
   const renderHighlightedContent = () => {
-    if (!article?.content) {
+    if (!article?.content || !highlights.length) {
       return article?.content;
     }
 
     let content = article.content;
-    const sortedHighlights = [...highlights].sort((a, b) => 
+    // Sort highlights in reverse order (highest offset first) to avoid position shifting
+    const sortedHighlights = [...highlights].sort((a, b) =>
       parseInt(b.startOffset) - parseInt(a.startOffset)
     );
 
     for (const highlight of sortedHighlights) {
       const start = parseInt(highlight.startOffset);
       const end = parseInt(highlight.endOffset);
+
       content = content.slice(0, start) +
-        `<mark style="background-color: ${highlight.color}; opacity: 0.5; padding: 2px;">${content.slice(start, end)}</mark>` +
+        `<span class="highlight" style="background-color: ${highlight.color}40; cursor: pointer;" title="${highlight.note || ''}">${content.slice(start, end)}</span>` +
         content.slice(end);
     }
 
