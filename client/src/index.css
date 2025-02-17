@@ -143,12 +143,14 @@
 .markdown-content table {
   width: 100%;
   margin: 1.5rem 0;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 1px solid hsl(var(--border));
   font-size: 0.875rem;
   line-height: 1.25rem;
-  display: table;
-  table-layout: auto;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .markdown-content th {
@@ -162,8 +164,19 @@
 .markdown-content td {
   padding: 0.75rem;
   border: 1px solid hsl(var(--border));
-  text-align: left;
-  vertical-align: top;
+  text-align: center;
+  vertical-align: middle;
+  min-width: 100px;
+}
+
+.markdown-content th {
+  position: sticky;
+  top: 0;
+  background-color: hsl(var(--muted));
+  z-index: 1;
+  padding: 0.75rem;
+  text-align: center;
+  border: 1px solid hsl(var(--border));
 }
 
 .markdown-content img {
