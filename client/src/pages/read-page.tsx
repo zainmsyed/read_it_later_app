@@ -113,6 +113,7 @@ const createHighlightMutation = useMutation({
       setHighlightColor("yellow");
       setHighlightNote("");
       setSelectedHighlightId(null);
+      setSelectionRange(null);
     },
   });
 
@@ -255,7 +256,7 @@ const createHighlightMutation = useMutation({
 
 
   const createHighlight = () => {
-    if (!selectedHighlightId && (!selectionRange || !selectedText)) {
+    if (!selectedHighlightId && !selectedText && !selectionRange) {
       toast({
         title: "Error",
         description: "Please select some text first",
