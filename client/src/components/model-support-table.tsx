@@ -27,7 +27,78 @@ export function ModelSupportTable() {
             <TableCell className="text-center">❌</TableCell>
             <TableCell className="text-center">❌</TableCell>
           </TableRow>
-          {/* Add more rows as needed */}
+          <TableRow>
+            <TableCell><a href="model_doc/altclip">AltCLIP</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/aria">Aria</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/aria_text">AriaText</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/audio-spectrogram-transformer">Audio Spectrogram Transformer</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/autoformer">Autoformer</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/bamba">Bamba</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/bark">Bark</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/bart">BART</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/barthez">BARThez</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/bartpho">BARTpho</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/beit">BEiT</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">❌</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell><a href="model_doc/bert">BERT</a></TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+            <TableCell className="text-center">✅</TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </ScrollArea>
