@@ -350,55 +350,53 @@ export default function ReadPage() {
         <div className="flex-1 flex items-center gap-4 mx-4">
           <div className="flex flex-wrap gap-2">
             {article.tags?.map((tag) => (
-              <Badge key={tag} variant="secondary">
+              <Badge key={tag} variant="secondary" className="bg-background/40 text-muted-foreground">
                 {tag}
               </Badge>
             ))}
           </div>
           <Button
-            size="sm"
+            size="icon"
             variant="ghost"
             onClick={startEditing}
+            className="text-muted-foreground hover:text-foreground"
           >
-            <Tag className="h-4 w-4 mr-2" />
-            Edit Tags
+            <Tag className="h-4 w-4" />
           </Button>
         </div>
-        <div className="flex gap-2">
-          <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={article.read}
-                  onChange={(e) => {
-                    updateArticleMutation.mutate({ read: e.target.checked });
-                  }}
-                  className="w-4 h-4 rounded border-gray-300"
-                />
-                <span className="text-sm">Mark as read</span>
-              </label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
-              >
-                <BookOpenText className="h-4 w-4 mr-2" />
-                Export Notes
-              </Button>
-            </div>
-
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mr-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className={cn(
+                "text-muted-foreground hover:text-foreground",
+                article.read && "text-foreground"
+              )}
+              onClick={() => updateArticleMutation.mutate({ read: !article.read })}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => window.open(`/api/articles/${params?.id}/markdown`, '_blank')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <BookOpenText className="h-4 w-4" />
+            </Button>
+          </div>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => {
               if (confirm("Are you sure you want to delete this article? This action cannot be undone.")) {
                 deleteArticleMutation.mutate();
               }
             }}
-            className="text-destructive hover:text-destructive"
+            className="text-muted-foreground hover:text-destructive"
           >
-            <X className="h-4 w-4 mr-2" />
-            Delete
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </header>
