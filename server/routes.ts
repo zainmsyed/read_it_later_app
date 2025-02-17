@@ -398,13 +398,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/upload", async (req, res) => {
+  app.post("/api/upload", upload.single('file'), async (req, res) => {
     if (!req.user) return res.sendStatus(401);
     
     try {
-      const uploadMiddleware = upload.single('file');
-      
-      uploadMiddleware(req, res, async (err) => {
         if (err instanceof multer.MulterError) {
           return res.status(400).json({ message: err.message });
         } else if (err) {

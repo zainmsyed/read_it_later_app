@@ -108,27 +108,50 @@ export default function HomePage() {
     );
   };
 
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+      
+      return res.json();
+    }
+  });
+
   const addArticleMutation = useMutation({
     mutationFn: async (data: { url: string; tags: string[]; file: File | null }) => {
       if (data.file) {
-        // Handle file upload first
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', data.file);
-        
-        const uploadRes = await fetch('/api/upload', {
+        const uploadResult = await uploadFileMutation.mutateAsync(data.file);
+        // Then create article with the file URL
+        const res = await fetch('/api/articles', {
           method: 'POST',
-          body: uploadFormData,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: uploadResult.url,
+            tags: data.tags
+          }),
           credentials: 'include'
         });
-        
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) {
-          throw new Error(uploadData.message || 'Failed to upload file');
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.message || 'Failed to create article');
         }
-        
-        const { url: fileUrl } = uploadData;
-        
-        // Then create article with the file URL
+
+        return res.json();
+      } else {
         const res = await fetch('/api/articles', {
           method: 'POST',
           headers: {
