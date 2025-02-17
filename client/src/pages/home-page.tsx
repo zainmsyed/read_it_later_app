@@ -110,19 +110,47 @@ export default function HomePage() {
 
   const addArticleMutation = useMutation({
     mutationFn: async (data: { url: string; tags: string[]; file: File | null }) => {
-      const formData = new FormData();
       if (data.file) {
-        formData.append('file', data.file);
+        // Handle file upload first
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', data.file);
+        
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+          credentials: 'include'
+        });
+        
+        if (!uploadRes.ok) {
+          throw new Error('Failed to upload file');
+        }
+        
+        const { url: fileUrl } = await uploadRes.json();
+        
+        // Then create article with the file URL
+        const res = await fetch('/api/articles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: fileUrl,
+            tags: data.tags
+          }),
+          credentials: 'include'
+        });
       } else {
-        formData.append('url', data.url.trim());
-      }
-      data.tags.forEach(tag => formData.append('tags[]', tag));
-
-      const res = await fetch('/api/articles', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
+        const res = await fetch('/api/articles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            url: data.url.trim(),
+            tags: data.tags
+          }),
+          credentials: 'include'
+        });
       const responseData = await res.json();
       if (!res.ok) {
         throw new Error(responseData.message || "Failed to save article");
