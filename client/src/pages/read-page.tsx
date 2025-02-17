@@ -439,7 +439,8 @@ export default function ReadPage() {
             </Tooltip>
           </TooltipProvider>
         </div>
-      </header>
+      </div>
+    </header>
 
       {/* Highlight Creation Dialog */}
       <Dialog open={isCreatingHighlight} onOpenChange={(open) => !open && setIsCreatingHighlight(false)}>
