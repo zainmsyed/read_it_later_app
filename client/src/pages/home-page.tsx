@@ -145,7 +145,11 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="newspaper-container">
+      <h1 className="newspaper-title">Postea</h1>
+      <div className="newspaper-subtitle">
+        THE WORLD'S FINEST READING LIST • SINCE 2024
+      </div>
       <div className="fixed top-0 left-0 h-screen w-64 bg-muted border-r border-border overflow-y-auto">
         <div className="p-8">
 
@@ -402,7 +406,7 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="article-grid">
               {filteredArticles?.map((article) => (
                 <Card key={article.id} className="hover:bg-muted/50 transition-colors article-list">
                   <CardContent className="p-6 flex justify-between items-start">
@@ -590,6 +594,5 @@ export default function HomePage() {
       </Dialog>
       <SearchCommandPalette open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
-  </div>
   );
 }
