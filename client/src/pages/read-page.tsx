@@ -377,8 +377,8 @@ export default function ReadPage() {
                     size="icon"
                     variant="ghost"
                     className={cn(
-                      "text-muted-foreground hover:text-foreground",
-                      article.read && "text-green-500"
+                      "text-muted-foreground hover:text-foreground rounded-full",
+                      article.read && "text-green-500 bg-green-500/10"
                     )}
                     onClick={() => updateArticleMutation.mutate({ read: !article.read })}
                   >
