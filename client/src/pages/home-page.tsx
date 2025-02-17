@@ -132,7 +132,6 @@ export default function HomePage() {
     mutationFn: async (data: { url: string; tags: string[]; file: File | null }) => {
       if (data.file) {
         const uploadResult = await uploadFileMutation.mutateAsync(data.file);
-        // Then create article with the file URL
         const res = await fetch('/api/articles', {
           method: 'POST',
           headers: {
@@ -158,7 +157,7 @@ export default function HomePage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            url: fileUrl,
+            url: data.url.trim(),
             tags: data.tags
           }),
           credentials: 'include'
@@ -168,9 +167,7 @@ export default function HomePage() {
           throw new Error(responseData.message || "Failed to save article");
         }
         return responseData;
-      } else {
-        const res = await fetch('/api/articles', {
-          method: 'POST',
+      }
           headers: {
             'Content-Type': 'application/json',
           },
